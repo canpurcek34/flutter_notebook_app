@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "718266488811",
+    "project_id": "flutter-note-app-fd9bc",
+    "storage_bucket": "flutter-note-app-fd9bc.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:718266488811:android:f7cc6ca6ebb86239746bae",
+        "android_client_info": {
+          "package_name": "com.canpurcek.flutternotebook"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC65pyP2MVJYNWj_z54O2oIjH2GXRB2Wz8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
