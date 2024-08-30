@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-import 'edit_note_screen.dart';
-import 'add_note_screen.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:http/http.dart' as http;
+import 'package:notebook_app/add_note_screen.dart';
+import 'dart:convert';
+
+import 'package:notebook_app/edit_note_screen.dart';
 
 class NotebookScreen extends StatefulWidget {
+  const NotebookScreen({super.key});
+
   @override
   _NotebookScreenState createState() => _NotebookScreenState();
 }
@@ -25,7 +28,8 @@ class _NotebookScreenState extends State<NotebookScreen> {
     );
 
     final data = json.decode(response.body);
-    print(data); // Verilerin doğru bir şekilde çekilip çekilmediğini kontrol etmek için
+    print(
+        data); // Verilerin doğru bir şekilde çekilip çekilmediğini kontrol etmek için
 
     if (data['success'] == 1) {
       setState(() {
@@ -38,96 +42,90 @@ class _NotebookScreenState extends State<NotebookScreen> {
     }
   }
 
-  Color _getNoteColor(int index) {
-    List<Color> colors = [
-      Colors.blueGrey.shade900,
-      Colors.blue.shade900,
-      Colors.green.shade900,
-      Colors.orange.shade900,
-      Colors.brown.shade900,
-      Colors.teal.shade900,
-    ];
-    return colors[index % colors.length];
-  }
-
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        elevation: 2,
-        title: Text("Notebook"),
-        backgroundColor: Colors.blue,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: MasonryGridView.builder(
-          gridDelegate: SliverSimpleGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-          ),
-          itemCount: _notes.length,
-          itemBuilder: (context, index) {
-            final note = _notes[index];
-            return GestureDetector(
-              onTap: () async {
-                final result = await Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => EditNoteScreen(note: note),
-                  ),
-                );
-                if (result == true) {
-                  _fetchNotes(); // Eğer not başarıyla güncellendiyse, notları yeniden çek
-                }
-              },
-              child: Card(
-                color: _getNoteColor(index),
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        note['title'],
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                      SizedBox(height: 8.0),
-                      Container(
-                        alignment: Alignment.topLeft,
-                        child: Text(
-                          note['note'],
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ),
-                      SizedBox(height: 8.0),
-                      Text(
-                        note['date'],
-                        style: TextStyle(color: Colors.white70),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            );
-          },
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: Scaffold(
+        body: Container(
+          child: masonryView(context),
+        ),
+        floatingActionButton: floating(context),
+        appBar: AppBar(
+          title: Text("Flutter Note App"),
+          backgroundColor: Colors.cyan,
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          final result = await Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => AddNoteScreen()),
+    );
+  }
+
+  Widget masonryView(BuildContext context) {
+    return MasonryGridView.builder(
+        gridDelegate:
+            SliverSimpleGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
+        itemCount: _notes.length,
+        itemBuilder: (context, index) {
+          final note = _notes[index];
+          return GestureDetector(
+            onTap: () async {
+              final result = await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => EditNoteScreen(note: note),
+                ),
+              );
+              if (result == true) {
+                _fetchNotes(); // Eğer not başarıyla güncellendiyse, notları yeniden çek
+              }
+            },
+            child: Card(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      note['title'],
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
+                    ),
+                    SizedBox(height: 8.0),
+                    Container(
+                      alignment: Alignment.topLeft,
+                      child: Text(
+                        note['note'],
+                        style: TextStyle(color: Colors.black),
+                      ),
+                    ),
+                    SizedBox(height: 8.0),
+                    Text(
+                      note['date'],
+                      style: TextStyle(color: Colors.black),
+                    ),
+                  ],
+                ),
+              ),
+            ),
           );
-          if (result == true) {
-            _fetchNotes(); // Eğer yeni not eklendiyse, notları yeniden çek
-          }
-        },
-        child: Icon(Icons.add),
-        backgroundColor: Colors.blue,
-      ),
+        });
+  }
+
+  Widget floating(BuildContext context) {
+    return FloatingActionButton(
+      onPressed: () async {
+            final result = await Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => AddNoteScreen()
+              ),
+            );
+            if (result == true) {
+              _fetchNotes(); // Eğer yeni not eklendiyse, notları yeniden çek
+            }
+          },
+      child: Icon(Icons.add),
+      backgroundColor: Colors.blue,
     );
   }
 }
