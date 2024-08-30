@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:http/http.dart' as http;
-import 'package:notebook_app/add_note_screen.dart';
+import 'package:notebook_app/ui/add_note_screen.dart';
 import 'dart:convert';
 
-import 'package:notebook_app/edit_note_screen.dart';
+import 'package:notebook_app/ui/edit_note_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 
 enum SampleItem { itemOne, itemTwo, itemThree }
@@ -26,14 +27,16 @@ class _NotebookScreenState extends State<NotebookScreen> {
   }
 
   Future<void> _fetchNotes() async {
-    final response = await http.get(
-      Uri.parse('https://emrecanpurcek.com.tr/notebook/get.php'),
-    );
+  final token = await _getToken(); // JWT token'ı alın
+  final response = await http.get(
+    Uri.parse('https://emrecanpurcek.com.tr/notebook/get.php'),
+    headers: {
+      'Authorization': 'Bearer $token', // Token'ı ekleyin
+    },
+  );
 
+  if (response.statusCode == 200) {
     final data = json.decode(response.body);
-    print(
-        data); // Verilerin doğru bir şekilde çekilip çekilmediğini kontrol etmek için
-
     if (data['success'] == 1) {
       setState(() {
         _notes = data['data'];
@@ -43,7 +46,17 @@ class _NotebookScreenState extends State<NotebookScreen> {
         SnackBar(content: Text('Error: ${data['message']}')),
       );
     }
+  } else {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Error: ${response.statusCode}')),
+    );
   }
+}
+
+Future<String?> _getToken() async {
+  final prefs = await SharedPreferences.getInstance();
+  return prefs.getString('token');
+}
 
   Future<void> deleteNote(BuildContext context, String id) async {
   final response = await http.post(

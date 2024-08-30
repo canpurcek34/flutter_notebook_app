@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'notebook_screen.dart';
+import 'package:notebook_app/ui/notebook_screen.dart';
 
 void main() {
   runApp(MyApp());
