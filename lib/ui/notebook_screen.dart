@@ -97,8 +97,14 @@ Future<String?> _getToken() async {
   }
 
   Widget masonryView(BuildContext context) {
+  // Ekran genişliğini al
+  final screenWidth = MediaQuery.of(context).size.width;
+
+  // Sütun sayısını belirle (mobilde 2, PC'de 4)
+  int crossAxisCount = screenWidth < 600 ? 2 : 4;
+
   return MasonryGridView.builder(
-    gridDelegate: SliverSimpleGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
+    gridDelegate: SliverSimpleGridDelegateWithFixedCrossAxisCount(crossAxisCount: crossAxisCount),
     itemCount: _notes.length,
     itemBuilder: (context, index) {
       final note = _notes[index];
@@ -121,7 +127,7 @@ Future<String?> _getToken() async {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween, // Bu satırı ekleyin
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
                       note['title'],
@@ -133,10 +139,7 @@ Future<String?> _getToken() async {
                     PopupMenuButton(
                       onSelected: (value) async {
                         if (value == SampleItem.itemOne) {
-                          // Silme işlemi
                           await deleteNote(context, note['id']);
-
-                          // Ekranı güncellemek için setState ile _fetchNotes çağrısı
                           setState(() {
                             _fetchNotes();
                           });
@@ -149,7 +152,6 @@ Future<String?> _getToken() async {
                         ),
                       ],
                     ),
-
                   ],
                 ),
                 SizedBox(height: 8.0),
@@ -157,6 +159,8 @@ Future<String?> _getToken() async {
                   alignment: Alignment.topLeft,
                   child: Text(
                     note['note'],
+                    maxLines: 10, //maksimum 10 satır halinde görüntüle
+                    overflow: TextOverflow.ellipsis, //10.satır sonunda notun devam ettiğini "..." ifadesi ile gösterme
                     style: TextStyle(color: Colors.black),
                   ),
                 ),
