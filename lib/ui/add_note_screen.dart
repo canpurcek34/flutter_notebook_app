@@ -63,7 +63,10 @@ class _AddNoteScreenState extends State<AddNoteScreen> {
           child: Column(
             children: [
               TextFormField(
-                decoration: InputDecoration(labelText: 'Başlık'),
+                decoration: InputDecoration(
+                  labelText: 'Başlık',
+                  border: InputBorder.none
+                  ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Başlık giriniz';
@@ -75,7 +78,10 @@ class _AddNoteScreenState extends State<AddNoteScreen> {
                 },
               ),
               TextFormField(
-                decoration: InputDecoration(labelText: 'Not'),
+                decoration: InputDecoration(
+                  labelText: 'Not',
+                  border: InputBorder.none
+                  ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Not giriniz';

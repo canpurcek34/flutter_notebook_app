@@ -86,22 +86,36 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
             children: [
               TextField(
                 controller: _titleController,
-                decoration: InputDecoration(labelText: 'Title'),
+                decoration: InputDecoration(
+                  labelText: 'Title',
+                  border: InputBorder.none,
+                  labelStyle: TextStyle(
+                    fontSize: 20.0,
+                    color: Colors.black
+                  )
+                  ),                  
               ),
               TextField(
                 controller: _noteController,
-                decoration: InputDecoration(labelText: 'Note'),
+                decoration: InputDecoration(
+                  labelText: 'Note',
+                  border: InputBorder.none,
+                  labelStyle: TextStyle(
+                    fontSize: 20.0,
+                    color: Colors.black
+                  )
+                  ),
                 maxLines: 6,
               ),
               SizedBox(height: 16),
               Text(
                 'Düzenlenme zamanı: $_date', // Salt okunur tarih
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                style: TextStyle(fontSize: 16,),
               ),
               SizedBox(height: 16),
               Text(
                 'id: $id ', // Salt okunur id
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                style: TextStyle(fontSize: 16,),
               ),
               SizedBox(height: 20),
               ElevatedButton(
