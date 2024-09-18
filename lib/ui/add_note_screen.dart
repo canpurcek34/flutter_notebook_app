@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/date_symbol_data_local.dart';
 import 'dart:convert';
+import 'package:intl/intl.dart'; // DateFormat için
 
 class AddNoteScreen extends StatefulWidget {
   @override
@@ -11,13 +13,20 @@ class _AddNoteScreenState extends State<AddNoteScreen> {
   final _formKey = GlobalKey<FormState>();
   String _title = '';
   String _note = '';
+  String? _formattedDate; // Formatlanmış tarih
 
   @override
   void initState() {
     super.initState();
-  }
 
-  final _date = DateTime.now(); //tarih formatı düzenlenecek
+    // Tarih formatını başlatıyoruz ve ardından formatlı tarihi alıyoruz
+    initializeDateFormatting('tr_TR', null).then((_) {
+      setState(() {
+        DateTime now = DateTime.now();
+        _formattedDate = DateFormat.yMMMMd('tr_TR').add_jm().format(now);
+      });
+    });
+  }
 
   Future<void> addNote() async {
     final response = await http.post(
@@ -28,20 +37,21 @@ class _AddNoteScreenState extends State<AddNoteScreen> {
       body: jsonEncode(<String, String>{
         'title': _title,
         'note': _note,
-        'date': _date.toString(),
+        'date': _formattedDate ??
+            DateTime.now().toString(), // Formatlanmış tarihi gönderiyoruz
       }),
     );
 
     final Map<String, dynamic> responseData = json.decode(response.body);
 
     if (responseData['success'] == 1) {
-      Navigator.pop(context, true); // Başarılı olursa geri dön ve listeyi yenile
+      Navigator.pop(
+          context, true); // Başarılı olursa geri dön ve listeyi yenile
       print("Yeni veri girişi başarılı.");
     } else {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text(responseData['message'] ?? 'Bir hata oluştu'),
-        behavior: SnackBarBehavior.floating
-      ));
+          content: Text(responseData['message'] ?? 'Bir hata oluştu'),
+          behavior: SnackBarBehavior.floating));
       print("Yeni veri girişi başarısız.");
     }
   }
@@ -58,7 +68,7 @@ class _AddNoteScreenState extends State<AddNoteScreen> {
           key: _formKey,
           child: Column(
             children: [
-              Container( //gölgelendirme için gerekli container
+              Container(
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(8),
@@ -70,7 +80,6 @@ class _AddNoteScreenState extends State<AddNoteScreen> {
                       offset: Offset(0, 3), // Gölgenin konumu
                     ),
                   ],
-                  //border: Border.all(color: Colors.grey), //textfield kenarlığı
                 ),
                 child: Padding(
                   padding: EdgeInsets.symmetric(horizontal: 16),
@@ -104,7 +113,6 @@ class _AddNoteScreenState extends State<AddNoteScreen> {
                       offset: Offset(0, 3),
                     ),
                   ],
-                  //border: Border.all(color: Colors.grey), //texfield kenarlığı
                 ),
                 child: Padding(
                   padding: EdgeInsets.symmetric(horizontal: 16),
@@ -113,8 +121,8 @@ class _AddNoteScreenState extends State<AddNoteScreen> {
                       labelText: 'Not',
                       border: InputBorder.none,
                     ),
-                    maxLines: null, // Kullanıcı istediği kadar satır ekleyebilir
-                    keyboardType: TextInputType.multiline, // Çok satırlı metin girişi sağlar
+                    maxLines: null,
+                    keyboardType: TextInputType.multiline,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Not giriniz';

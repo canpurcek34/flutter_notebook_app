@@ -19,10 +19,14 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
 
   @override
   void initState() {
-    super.initState();
+    super
+        .initState(); //initialize edip ilgili note cardına tıkladığımızda verilerin o ekrana geçmesini sağlıyor
     _titleController.text = widget.note['title'] ?? '';
     _noteController.text = widget.note['note'] ?? '';
-    _date = widget.note['date'] ?? DateFormat.yMMMMd('en_US').add_jm().toString(); //tarih formatı düzenlenecek
+    _date = widget.note['date'] ??
+        DateFormat.yMMMMd('tr_TR')
+            .add_jm()
+            .toString(); //tarih formatı düzenlenecek
   }
 
   Future<void> _updateNote() async {
@@ -31,7 +35,7 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
-      body: jsonEncode(<String, dynamic>{
+      body: jsonEncode(<String, String>{
         'id': widget.note['id'],
         'title': _titleController.text,
         'note': _noteController.text,
@@ -50,9 +54,8 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Hata: ${data['message']}'),
-          behavior: SnackBarBehavior.floating
-        ),
+            content: Text('Hata: ${data['message']}'),
+            behavior: SnackBarBehavior.floating),
       );
       print("Veri güncellenmesi başarısız");
     }
@@ -65,14 +68,14 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
       appBar: AppBar(
         title: Text('Düzenle'),
         actions: [
-          IconButton(
+          /*IconButton(
             icon: Icon(Icons.save),
             onPressed: () {
               setState(() {
                 _updateNote();
               });
             },
-          ),
+          ),*/
         ],
       ),
       // SingleChildScrollView for scrollable content
@@ -101,7 +104,7 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
                   child: TextField(
                     controller: _titleController,
                     decoration: InputDecoration(
-                      labelText: 'Title',
+                      //labelText: 'Title',
                       border: InputBorder.none,
                       labelStyle: TextStyle(
                         fontSize: 20.0,
@@ -131,7 +134,7 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
                   child: TextField(
                     controller: _noteController,
                     decoration: InputDecoration(
-                      labelText: 'Note',
+                      //labelText: 'Note',
                       border: InputBorder.none,
                       labelStyle: TextStyle(
                         fontSize: 20.0,
@@ -165,9 +168,10 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
                         ],
                       ),
                       child: Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                         child: Text(
-                          'Düzenlenme zamanı: $_date',
+                          'Düzenlenme Zamanı: $_date',
                           style: TextStyle(fontSize: 16, color: Colors.black),
                         ),
                       ),
@@ -190,7 +194,8 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
                         ],
                       ),
                       child: Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                         child: Text(
                           'id: $id',
                           style: TextStyle(fontSize: 16, color: Colors.black),
@@ -205,6 +210,8 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
               ElevatedButton(
                 onPressed: () {
                   _updateNote();
+
+                  print(_titleController.text);
                 },
                 child: Text('Kaydet'),
               ),
