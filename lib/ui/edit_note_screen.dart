@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-
 import 'package:intl/intl.dart';
 
 class EditNoteScreen extends StatefulWidget {
@@ -23,7 +22,7 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
     super.initState();
     _titleController.text = widget.note['title'] ?? '';
     _noteController.text = widget.note['note'] ?? '';
-    _date = widget.note['date'] ?? DateFormat.yMMMMd('en_US').add_jm(); //tarih formatı düzenlenecek
+    _date = widget.note['date'] ?? DateFormat.yMMMMd('en_US').add_jm().toString(); //tarih formatı düzenlenecek
   }
 
   Future<void> _updateNote() async {
@@ -53,7 +52,7 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
         SnackBar(
           content: Text('Hata: ${data['message']}'),
           behavior: SnackBarBehavior.floating
-          ),
+        ),
       );
       print("Veri güncellenmesi başarısız");
     }
@@ -64,7 +63,7 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
     final id = widget.note['id'];
     return Scaffold(
       appBar: AppBar(
-        title: Text('Edit Note'),
+        title: Text('Düzenle'),
         actions: [
           IconButton(
             icon: Icon(Icons.save),
@@ -76,138 +75,141 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
           ),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Title TextField
-            Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(8),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.5),
-                    spreadRadius: 2,
-                    blurRadius: 5,
-                    offset: Offset(0, 3), // Gölgenin konumu
-                  ),
-                ],
-              ),
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16),
-                child: TextField(
-                  controller: _titleController,
-                  decoration: InputDecoration(
-                    labelText: 'Title',
-                    border: InputBorder.none,
-                    labelStyle: TextStyle(
-                      fontSize: 20.0,
-                      color: Colors.black,
+      // SingleChildScrollView for scrollable content
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Title TextField
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(8),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.5),
+                      spreadRadius: 2,
+                      blurRadius: 5,
+                      offset: Offset(0, 3), // Gölgenin konumu
                     ),
-                  ),
+                  ],
                 ),
-              ),
-            ),
-            SizedBox(height: 16),
-            // Note TextField
-            Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(8),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.5),
-                    spreadRadius: 2,
-                    blurRadius: 5,
-                    offset: Offset(0, 3),
-                  ),
-                ],
-              ),
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16),
-                child: TextField(
-                  controller: _noteController,
-                  decoration: InputDecoration(
-                    labelText: 'Note',
-                    border: InputBorder.none,
-                    labelStyle: TextStyle(
-                      fontSize: 20.0,
-                      color: Colors.black,
-                    ),
-                  ),
-                  minLines: 1, // Minimum satır sayısı
-                  maxLines: null, // Metin büyüdükçe yüksekliği artırır
-                  expands: false, // Dinamik genişlemeyi sağlar
-                ),
-              ),
-            ),
-            SizedBox(height: 16),
-            // Date and ID in a Row
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                // Date Container
-                Expanded(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(8),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.grey.withOpacity(0.5),
-                          spreadRadius: 2,
-                          blurRadius: 5,
-                          offset: Offset(0, 3),
-                        ),
-                      ],
-                    ),
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                      child: Text(
-                        'Düzenlenme zamanı: $_date',
-                        style: TextStyle(fontSize: 16, color: Colors.black),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16),
+                  child: TextField(
+                    controller: _titleController,
+                    decoration: InputDecoration(
+                      labelText: 'Title',
+                      border: InputBorder.none,
+                      labelStyle: TextStyle(
+                        fontSize: 20.0,
+                        color: Colors.black,
                       ),
                     ),
                   ),
                 ),
-                SizedBox(width: 16),
-                // ID Container
-                Expanded(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(8),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.grey.withOpacity(0.5),
-                          spreadRadius: 2,
-                          blurRadius: 5,
-                          offset: Offset(0, 3),
-                        ),
-                      ],
+              ),
+              SizedBox(height: 16),
+              // Note TextField
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(8),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.5),
+                      spreadRadius: 2,
+                      blurRadius: 5,
+                      offset: Offset(0, 3),
                     ),
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                      child: Text(
-                        'id: $id',
-                        style: TextStyle(fontSize: 16, color: Colors.black),
+                  ],
+                ),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16),
+                  child: TextField(
+                    controller: _noteController,
+                    decoration: InputDecoration(
+                      labelText: 'Note',
+                      border: InputBorder.none,
+                      labelStyle: TextStyle(
+                        fontSize: 20.0,
+                        color: Colors.black,
+                      ),
+                    ),
+                    minLines: 1, // Minimum satır sayısı
+                    maxLines: null, // Metin büyüdükçe yüksekliği artırır
+                    expands: false, // Dinamik genişlemeyi sağlar
+                  ),
+                ),
+              ),
+              SizedBox(height: 16),
+              // Date and ID in a Row
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  // Date Container
+                  Expanded(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(8),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.5),
+                            spreadRadius: 2,
+                            blurRadius: 5,
+                            offset: Offset(0, 3),
+                          ),
+                        ],
+                      ),
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                        child: Text(
+                          'Düzenlenme zamanı: $_date',
+                          style: TextStyle(fontSize: 16, color: Colors.black),
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ],
-            ),
-            SizedBox(height: 20),
-            // Save Button
-            ElevatedButton(
-              onPressed: () {
-                _updateNote();
-              },
-              child: Text('Kaydet'),
-            ),
-          ],
+                  SizedBox(width: 16),
+                  // ID Container
+                  Expanded(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(8),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.5),
+                            spreadRadius: 2,
+                            blurRadius: 5,
+                            offset: Offset(0, 3),
+                          ),
+                        ],
+                      ),
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                        child: Text(
+                          'id: $id',
+                          style: TextStyle(fontSize: 16, color: Colors.black),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 20),
+              // Save Button
+              ElevatedButton(
+                onPressed: () {
+                  _updateNote();
+                },
+                child: Text('Kaydet'),
+              ),
+            ],
+          ),
         ),
       ),
     );

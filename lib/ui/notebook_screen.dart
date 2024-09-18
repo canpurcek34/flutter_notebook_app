@@ -101,7 +101,7 @@ Future<String?> _getToken() async {
         ),
         floatingActionButton: floating(context),
         appBar: AppBar(
-          title: Text("Flutter Note App"),
+          title: Text("Note App"),
           backgroundColor: Colors.cyan,
         ),
       ),
