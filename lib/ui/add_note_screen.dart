@@ -40,6 +40,7 @@ class _AddNoteScreenState extends State<AddNoteScreen> {
     } else {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text(responseData['message'] ?? 'Bir hata oluştu'),
+        behavior: SnackBarBehavior.floating
       ));
       print("Yeni veri girişi başarısız.");
     }

@@ -50,7 +50,10 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
       print("Veri güncellenmesi başarılı");
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Hata: ${data['message']}')),
+        SnackBar(
+          content: Text('Hata: ${data['message']}'),
+          behavior: SnackBarBehavior.floating
+          ),
       );
       print("Veri güncellenmesi başarısız");
     }

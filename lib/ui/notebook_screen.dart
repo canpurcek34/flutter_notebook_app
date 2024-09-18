@@ -43,12 +43,18 @@ class _NotebookScreenState extends State<NotebookScreen> {
       });
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: ${data['message']}')),
+        SnackBar(
+          content: Text('Error: ${data['message']}'),
+          behavior: SnackBarBehavior.floating
+          ),
       );
     }
   } else {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Error: ${response.statusCode}')),
+      SnackBar(
+        content: Text('Error: ${response.statusCode}'),
+        behavior: SnackBarBehavior.floating
+        ),
     );
   }
 }
@@ -69,12 +75,18 @@ Future<String?> _getToken() async {
   if (data['success'] == 1) {
     // Başarılı silme işlemi
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Note deleted successfully')),
+      SnackBar(
+        content: Text('Note deleted successfully'),
+        behavior: SnackBarBehavior.floating
+        ),
     );
   } else {
     // Hata mesajı
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Error: ${data['message']}')),
+      SnackBar(
+        content: Text('Error: ${data['message']}'),
+        behavior: SnackBarBehavior.floating
+        ),
     );
   }
 }
