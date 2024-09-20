@@ -5,6 +5,7 @@ import 'package:notebook_app/ui/add_note_screen.dart';
 import 'dart:convert';
 import 'package:notebook_app/ui/edit_note_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shimmer/shimmer.dart';
 
 enum SampleItem { itemOne, itemTwo, itemThree }
 
@@ -24,6 +25,8 @@ class _NotebookScreenState extends State<NotebookScreen> {
     _fetchNotes();
   }
 
+  bool _isLoading = true;
+
   Future<void> _fetchNotes() async {
     final token = await _getToken(); // JWT token'ı alın
     final response = await http.get(
@@ -38,6 +41,7 @@ class _NotebookScreenState extends State<NotebookScreen> {
       if (data['success'] == 1) {
         setState(() {
           _notes = data['data'];
+          _isLoading = false; // Veriler yüklendiğinde shimmer'ı kapatıyoruz
         });
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -94,7 +98,10 @@ class _NotebookScreenState extends State<NotebookScreen> {
           // Ekranı aşağı çekme ile yenileme
           onRefresh: _fetchNotes, // Yenileme fonksiyonu
           child: Container(
-            child: masonryView(context),
+            child: _isLoading
+                ? _buildShimmer()
+                : masonryView(
+                    context), // Eğer yükleniyorsa shimmer gösteriyoruz
           ),
         ),
         floatingActionButton: floating(context),
@@ -204,6 +211,48 @@ class _NotebookScreenState extends State<NotebookScreen> {
       },
       backgroundColor: Colors.blue,
       child: Icon(Icons.add),
+    );
+  }
+
+  Widget _buildShimmer() {
+    return Shimmer.fromColors(
+      baseColor: Colors.grey[300]!,
+      highlightColor: Colors.grey[100]!,
+      child: MasonryGridView.builder(
+        gridDelegate: SliverSimpleGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+        ),
+        itemCount: 6, // Yüklenirken kaç tane shimmer gösterileceğini belirleyin
+        itemBuilder: (context, index) {
+          return Card(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    width: double.infinity,
+                    height: 20.0,
+                    color: Colors.white,
+                  ),
+                  SizedBox(height: 8.0),
+                  Container(
+                    width: double.infinity,
+                    height: 100.0,
+                    color: Colors.white,
+                  ),
+                  SizedBox(height: 8.0),
+                  Container(
+                    width: double.infinity,
+                    height: 20.0,
+                    color: Colors.white,
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
     );
   }
 }
