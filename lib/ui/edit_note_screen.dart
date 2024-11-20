@@ -31,7 +31,7 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
 
   Future<void> _updateNote() async {
     final response = await http.post(
-      Uri.parse('https://emrecanpurcek.com.tr/notebook/update.php'),
+      Uri.parse('https://emrecanpurcek.com.tr/projects/methods/update.php'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },

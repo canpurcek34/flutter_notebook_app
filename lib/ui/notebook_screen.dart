@@ -30,7 +30,7 @@ class _NotebookScreenState extends State<NotebookScreen> {
   Future<void> _fetchNotes() async {
     final token = await _getToken(); // JWT token'ı alın
     final response = await http.get(
-      Uri.parse('https://emrecanpurcek.com.tr/notebook/get.php'),
+      Uri.parse('https://emrecanpurcek.com.tr/projects/methods/get.php'),
       headers: {
         'Authorization': 'Bearer $token', // Token'ı ekleyin
       },
@@ -66,9 +66,20 @@ class _NotebookScreenState extends State<NotebookScreen> {
 
   Future<void> deleteNote(BuildContext context, String id) async {
     final response = await http.post(
-      Uri.parse('https://emrecanpurcek.com.tr/notebook/delete.php'),
+      Uri.parse('https://emrecanpurcek.com.tr/projects/methods/delete.php'),
       body: {'id': id},
     );
+
+    try {
+      final response = await http.post(
+        Uri.parse('https://emrecanpurcek.com.tr/projects/methods/delete.php'),
+        body: {'id': id},
+      );
+      print('Response status: ${response.statusCode}');
+      print('Response body: ${response.body}');
+    } catch (e) {
+      print('Error: $e');
+    }
 
     final data = json.decode(response.body);
 
@@ -76,15 +87,19 @@ class _NotebookScreenState extends State<NotebookScreen> {
       // Başarılı silme işlemi
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-            content: Text('Not başarıyla silindi.'),
-            behavior: SnackBarBehavior.floating),
+          content: Text('Not başarıyla silindi.'),
+          behavior: SnackBarBehavior.floating,
+        ),
       );
+      // Silme işleminden sonra notları yeniden yükle
+      _fetchNotes(); // Burada notları yeniden çekiyoruz.
     } else {
       // Hata mesajı
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-            content: Text('Error: ${data['message']}'),
-            behavior: SnackBarBehavior.floating),
+          content: Text('Error: ${data['message']}'),
+          behavior: SnackBarBehavior.floating,
+        ),
       );
     }
   }
@@ -157,10 +172,8 @@ class _NotebookScreenState extends State<NotebookScreen> {
                       PopupMenuButton(
                         onSelected: (value) async {
                           if (value == SampleItem.itemOne) {
-                            await deleteNote(context, note['id']);
-                            setState(() {
-                              _fetchNotes();
-                            });
+                            await deleteNote(
+                                context, note['id']); // Silme işlemi yapılıyor
                           }
                         },
                         itemBuilder: (BuildContext context) =>
