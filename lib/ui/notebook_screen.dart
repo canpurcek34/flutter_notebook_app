@@ -69,7 +69,7 @@ class _NotebookScreenState extends State<NotebookScreen> {
       final response = await http.post(
         Uri.parse('https://emrecanpurcek.com.tr/projects/methods/delete.php'),
         headers: {'Content-Type': 'application/json'},
-        body: json.encode({'id': 104}),
+        body: json.encode({'id': id}),
       );
 
       print('Response status: ${response.statusCode}');
