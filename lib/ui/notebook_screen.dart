@@ -65,39 +65,42 @@ class _NotebookScreenState extends State<NotebookScreen> {
   }
 
   Future<void> deleteNote(BuildContext context, String id) async {
-    final response = await http.post(
-      Uri.parse('https://emrecanpurcek.com.tr/projects/methods/delete.php'),
-      body: {'id': id},
-    );
-
     try {
       final response = await http.post(
         Uri.parse('https://emrecanpurcek.com.tr/projects/methods/delete.php'),
-        body: {'id': id},
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({'id': 104}),
       );
+
       print('Response status: ${response.statusCode}');
       print('Response body: ${response.body}');
+
+      final data = json.decode(response.body);
+
+      if (data['success'] == 1) {
+        // ignore: use_build_context_synchronously
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Not başarıyla silindi.'),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+        _fetchNotes(); // Notları yeniden yükle
+      } else {
+        // ignore: use_build_context_synchronously
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error: ${data['message']}'),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
     } catch (e) {
       print('Error: $e');
-    }
-
-    final data = json.decode(response.body);
-
-    if (data['success'] == 1) {
-      // Başarılı silme işlemi
+      // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Not başarıyla silindi.'),
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
-      // Silme işleminden sonra notları yeniden yükle
-      _fetchNotes(); // Burada notları yeniden çekiyoruz.
-    } else {
-      // Hata mesajı
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error: ${data['message']}'),
+          content: Text('Bir hata oluştu: $e'),
           behavior: SnackBarBehavior.floating,
         ),
       );
