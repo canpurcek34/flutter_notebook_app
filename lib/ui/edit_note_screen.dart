@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/date_symbol_data_local.dart';
 import 'dart:convert';
 import 'package:intl/intl.dart';
 
@@ -16,6 +17,7 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
   final _titleController = TextEditingController();
   final _noteController = TextEditingController();
   late String _date;
+  String? formattedDate; // Formatlanmış tarih
 
   @override
   void initState() {
@@ -29,33 +31,40 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
             .toString(); //tarih formatı düzenlenecek
   }
 
-  Future<void> _updateNote() async {
+  Future<void> updateNote() async {
+    // Tarih formatını başlatıyoruz ve ardından formatlı tarihi alıyoruz
+    await initializeDateFormatting('tr_TR', null); // Yerel ayarları başlat
+    final now = DateTime.now();
+    formattedDate = DateFormat('d MMMM y HH:mm', 'tr_TR')
+        .format(now); // Tarihi formatlıyoruz
+
+    // HTTP POST isteği gönderiliyor
     final response = await http.post(
       Uri.parse('https://emrecanpurcek.com.tr/projects/methods/update.php'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
       body: jsonEncode(<String, String>{
-        'id': widget.note['id'],
-        'title': _titleController.text,
-        'note': _noteController.text,
-        'date': _date,
+        'id': widget.note['id'], // Notun ID'si
+        'title': _titleController.text, // Güncellenmiş başlık
+        'note': _noteController.text, // Güncellenmiş not
+        'date':
+            formattedDate ?? now.toString(), // Formatlanmış tarihi gönderiyoruz
       }),
     );
 
-    print('Response status: ${response.statusCode}');
-    print('Response body: ${response.body}');
-
+    // Gelen cevabı işliyoruz
     final data = json.decode(response.body);
 
     if (data['success'] == 1) {
-      Navigator.pop(context, true);
+      Navigator.pop(context, true); // Başarılı ise geri dön
       print("Veri güncellenmesi başarılı");
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-            content: Text('Hata: ${data['message']}'),
-            behavior: SnackBarBehavior.floating),
+          content: Text('Hata: ${data['message']}'),
+          behavior: SnackBarBehavior.floating,
+        ),
       );
       print("Veri güncellenmesi başarısız");
     }
@@ -72,7 +81,7 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
             icon: Icon(Icons.save),
             onPressed: () {
               setState(() {
-                _updateNote();
+                updateNote();
               });
             },
           ),*/
@@ -209,7 +218,7 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
               // Save Button
               ElevatedButton(
                 onPressed: () {
-                  _updateNote();
+                  updateNote();
 
                   print(_titleController.text);
                 },
