@@ -40,7 +40,7 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
 
     // HTTP POST isteği gönderiliyor
     final response = await http.post(
-      Uri.parse('https://emrecanpurcek.com.tr/projects/methods/update.php'),
+      Uri.parse('https://emrecanpurcek.com.tr/projects/methods/note/update.php'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },

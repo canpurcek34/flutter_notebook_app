@@ -30,7 +30,7 @@ class _NotebookScreenState extends State<NotebookScreen> {
   Future<void> _fetchNotes() async {
     final token = await _getToken(); // JWT token'ı alın
     final response = await http.get(
-      Uri.parse('https://emrecanpurcek.com.tr/projects/methods/get.php'),
+      Uri.parse('https://emrecanpurcek.com.tr/projects/methods/note/get.php'),
       headers: {
         'Authorization': 'Bearer $token', // Token'ı ekleyin
       },
@@ -67,7 +67,7 @@ class _NotebookScreenState extends State<NotebookScreen> {
   Future<void> deleteNote(BuildContext context, String id) async {
     try {
       final response = await http.post(
-        Uri.parse('https://emrecanpurcek.com.tr/projects/methods/delete.php'),
+        Uri.parse('https://emrecanpurcek.com.tr/projects/methods/note/delete.php'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({'id': id}),
       );

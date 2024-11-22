@@ -1,8 +1,18 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:notebook_app/authpages/authScreen.dart';
 import 'package:notebook_app/ui/notebook_screen.dart';
 
-void main() {
+import 'authpages/authScreen.dart';
+import 'authpages/loginScreen.dart';
+import 'authpages/signScreen.dart';
+import 'firebase/firebase_options.dart';
+
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(MyApp());
 }
 
@@ -11,11 +21,15 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Flutter Notebook App',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: AuthScreen(), // Ana ekran olarak NotebookScreen'i ayarlayın
+      title: 'Authentication',
+      theme: ThemeData(primarySwatch: Colors.blue),
+      initialRoute: '/auth',
+      routes: {
+        '/auth': (context) => AuthScreen(),
+        '/signup': (context) => SignUpScreen(),
+        '/login': (context) => LoginScreen(),
+        '/notebook': (context) => NotebookScreen(),
+      },
     );
   }
 }

@@ -30,7 +30,7 @@ class _AddNoteScreenState extends State<AddNoteScreen> {
 
   Future<void> addNote() async {
     final response = await http.post(
-      Uri.parse('https://emrecanpurcek.com.tr/projects/methods/insert.php'),
+      Uri.parse('https://emrecanpurcek.com.tr/projects/methods/note/insert.php'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
