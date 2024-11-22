@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:notebook_app/authpages/authScreen.dart';
 import 'package:notebook_app/ui/notebook_screen.dart';
 
 void main() {
@@ -14,7 +15,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: NotebookScreen(), // Ana ekran olarak NotebookScreen'i ayarlayın
+      home: AuthScreen(), // Ana ekran olarak NotebookScreen'i ayarlayın
     );
   }
 }
