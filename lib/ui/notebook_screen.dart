@@ -157,6 +157,7 @@ class _NotebookScreenState extends State<NotebookScreen> {
           ),
           floatingActionButton: floating(context),
           appBar: AppBar(
+            backgroundColor: Colors.cyan,
             title: Text("Notebook"),
             actions: [
               IconButton(
