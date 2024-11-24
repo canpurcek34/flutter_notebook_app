@@ -30,8 +30,6 @@ class _AddNoteScreenState extends State<AddNoteScreen> {
   }
 
   Future<void> addNote() async {
-    final FirebaseAuth auth = FirebaseAuth.instance;
-
     final user =
         FirebaseAuth.instance.currentUser; // Firebase'den kullanıcı bilgisi al
     if (user == null) {

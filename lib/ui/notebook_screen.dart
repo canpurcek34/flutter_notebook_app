@@ -84,11 +84,6 @@ class _NotebookScreenState extends State<NotebookScreen> {
     }
   }
 
-  Future<String?> _getToken() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getString('token');
-  }
-
   Future<void> deleteNote(BuildContext context, String id) async {
     try {
       final response = await http.post(
@@ -165,9 +160,13 @@ class _NotebookScreenState extends State<NotebookScreen> {
             title: Text("Notebook"),
             actions: [
               IconButton(
+                icon: Icon(Icons.refresh),
+                onPressed: _fetchNotes,
+              ),
+              IconButton(
                 icon: Icon(Icons.logout),
                 onPressed: _logout,
-              ),
+              )
             ],
           )),
     );

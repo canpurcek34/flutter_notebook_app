@@ -44,6 +44,18 @@ class _LoginScreenState extends State<LoginScreen> {
 
       User? user = userCredential.user;
 
+      if (_keepLoggedIn) {
+        // Oturumu açık tut seçeneği aktifse kaydet
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setBool('isLoggedIn', true);
+      }
+
+      // Giriş başarılı, Notebook ekranına yönlendir
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => NotebookScreen()),
+      );
+
       if (user != null && !user.emailVerified) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
