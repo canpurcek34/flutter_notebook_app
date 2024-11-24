@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/date_symbol_data_local.dart';
@@ -29,12 +30,23 @@ class _AddNoteScreenState extends State<AddNoteScreen> {
   }
 
   Future<void> addNote() async {
+    final FirebaseAuth auth = FirebaseAuth.instance;
+
+    final user =
+        FirebaseAuth.instance.currentUser; // Firebase'den kullanıcı bilgisi al
+    if (user == null) {
+      throw Exception("Kullanıcı oturumu yok");
+    }
+    final uid = user.uid; // UUID'yi al
+
     final response = await http.post(
-      Uri.parse('https://emrecanpurcek.com.tr/projects/methods/note/insert.php'),
+      Uri.parse(
+          'https://emrecanpurcek.com.tr/projects/methods/note/insert.php'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
       body: jsonEncode(<String, String>{
+        'uuid': uid,
         'title': _title,
         'note': _note,
         'date': _formattedDate ??

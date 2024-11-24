@@ -10,17 +10,26 @@ class SignUpScreen extends StatelessWidget {
 
   Future<void> _signUp(BuildContext context) async {
     try {
-      await _auth.createUserWithEmailAndPassword(
+      // Kullanıcıyı oluştur
+      UserCredential userCredential =
+          await _auth.createUserWithEmailAndPassword(
         email: emailController.text,
         password: passwordController.text,
       );
 
+      // E-mail doğrulama linkini gönder
+      await userCredential.user?.sendEmailVerification();
+
+      // Kullanıcıya bilgi mesajı göster
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Kayıt başarılı!')),
+        SnackBar(
+          content: Text(
+            'Kayıt başarılı! Lütfen e-posta adresinizi doğrulayın.',
+          ),
+        ),
       );
 
-      // Yönlendirme: AuthScreen'e git
-      Navigator.pushReplacementNamed(context, '/auth');
+      // Kullanıcıyı doğrulamadan yönlendirme yapmayın
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Hata: $e')),

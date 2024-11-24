@@ -1,25 +1,64 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:notebook_app/ui/notebook_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key});
+
+  @override
+  _LoginScreenState createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+  bool _keepLoggedIn = false; // Oturumu açık tut seçeneği
 
-  Future<void> _login(BuildContext context) async {
+  @override
+  void initState() {
+    super.initState();
+    _checkLoginStatus(); // Oturum açık mı kontrol et
+  }
+
+  Future<void> _checkLoginStatus() async {
+    final prefs = await SharedPreferences.getInstance();
+    final isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
+
+    if (isLoggedIn) {
+      // Oturum açık ise direkt NoteScreen'e yönlendir
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => NotebookScreen()),
+      );
+    }
+  }
+
+  Future<void> login(BuildContext context) async {
     try {
-      await _auth.signInWithEmailAndPassword(
+      UserCredential userCredential = await _auth.signInWithEmailAndPassword(
         email: emailController.text,
         password: passwordController.text,
       );
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Giriş başarılı!')),
+      User? user = userCredential.user;
 
-      );
-
-      // Yönlendirme: NotebookScreen'e git
-      Navigator.pushReplacementNamed(context, '/notebook');
+      if (user != null && !user.emailVerified) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content:
+                Text('E-posta doğrulanmamış. Lütfen e-postanızı kontrol edin.'),
+          ),
+        );
+        await _auth.signOut(); // Oturumu kapat
+      } else {
+        // Giriş başarılı, Notebook ekranına yönlendir
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => NotebookScreen()),
+        );
+      }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Hata: $e')),
@@ -30,47 +69,39 @@ class LoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Giriş Yap'),
-        backgroundColor: Colors.blueAccent,
-        elevation: 0,
-      ),
+      appBar: AppBar(title: Text("Login")),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Center(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              TextField(
-                controller: emailController,
-                decoration: InputDecoration(
-                  labelText: 'E-posta Adresi',
-                  border: OutlineInputBorder(),
+        child: Column(
+          children: [
+            TextField(
+              controller: emailController,
+              decoration: InputDecoration(labelText: "Email"),
+            ),
+            TextField(
+              controller: passwordController,
+              decoration: InputDecoration(labelText: "Password"),
+              obscureText: true,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Checkbox(
+                  value: _keepLoggedIn,
+                  onChanged: (value) {
+                    setState(() {
+                      _keepLoggedIn = value ?? false;
+                    });
+                  },
                 ),
-              ),
-              SizedBox(height: 16),
-              TextField(
-                controller: passwordController,
-                decoration: InputDecoration(
-                  labelText: 'Şifre',
-                  border: OutlineInputBorder(),
-                ),
-                obscureText: true,
-              ),
-              SizedBox(height: 24),
-              ElevatedButton(
-                onPressed: () => _login(context),
-                child: Text('Giriş Yap'),
-              ),
-              SizedBox(height: 16),
-              TextButton(
-                onPressed: () {
-                  print('Şifremi Unuttum tıklandı');
-                },
-                child: Text('Şifremi Unuttum'),
-              ),
-            ],
-          ),
+                Text("Oturumu açık tut"),
+              ],
+            ),
+            ElevatedButton(
+              onPressed: () => login(context),
+              child: Text("Giriş Yap"),
+            ),
+          ],
         ),
       ),
     );

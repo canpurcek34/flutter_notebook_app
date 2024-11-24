@@ -1,6 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:http/http.dart' as http;
+import 'package:notebook_app/authpages/loginScreen.dart';
 import 'package:notebook_app/ui/add_note_screen.dart';
 import 'dart:convert';
 import 'package:notebook_app/ui/edit_note_screen.dart';
@@ -28,33 +30,56 @@ class _NotebookScreenState extends State<NotebookScreen> {
   bool _isLoading = true;
 
   Future<void> _fetchNotes() async {
-    final token = await _getToken(); // JWT token'ı alın
-    final response = await http.get(
-      Uri.parse('https://emrecanpurcek.com.tr/projects/methods/note/get.php'),
-      headers: {
-        'Authorization': 'Bearer $token', // Token'ı ekleyin
-      },
-    );
+    try {
+      final user = FirebaseAuth
+          .instance.currentUser; // Firebase'den kullanıcı bilgisi al
+      if (user == null) {
+        throw Exception("Kullanıcı oturumu yok");
+      }
+      final uid = user.uid; // UUID'yi al
 
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-      if (data['success'] == 1) {
-        setState(() {
-          _notes = data['data'];
-          _isLoading = false; // Veriler yüklendiğinde shimmer'ı kapatıyoruz
-        });
+      // HTTP POST isteği gönder
+      final response = await http.post(
+        Uri.parse('https://emrecanpurcek.com.tr/projects/methods/note/get.php'),
+        headers: {
+          'Content-Type': 'application/json', // JSON formatı belirtiyoruz
+        },
+        body: json.encode({'uuid': uid}), // UUID'yi body'de gönderiyoruz
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (data['success'] == 1) {
+          setState(() {
+            _notes = data['data'];
+            _isLoading = false; // Veriler başarıyla yüklendi
+          });
+        } else {
+          // Sunucu bir hata mesajı döndürdüyse
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Hata: ${data['message']}'),
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        }
       } else {
+        // HTTP isteği başarısız olduysa
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-              content: Text('Error: ${data['message']}'),
-              behavior: SnackBarBehavior.floating),
+            content: Text('Hata: ${response.statusCode}'),
+            behavior: SnackBarBehavior.floating,
+          ),
         );
       }
-    } else {
+    } catch (e) {
+      // İstek sırasında bir hata oluştuysa
+      print('Hata: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-            content: Text('Error: ${response.statusCode}'),
-            behavior: SnackBarBehavior.floating),
+          content: Text('Bir hata oluştu: $e'),
+          behavior: SnackBarBehavior.floating,
+        ),
       );
     }
   }
@@ -67,7 +92,8 @@ class _NotebookScreenState extends State<NotebookScreen> {
   Future<void> deleteNote(BuildContext context, String id) async {
     try {
       final response = await http.post(
-        Uri.parse('https://emrecanpurcek.com.tr/projects/methods/note/delete.php'),
+        Uri.parse(
+            'https://emrecanpurcek.com.tr/projects/methods/note/delete.php'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({'id': id}),
       );
@@ -107,27 +133,43 @@ class _NotebookScreenState extends State<NotebookScreen> {
     }
   }
 
+  Future<void> _logout() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('isLoggedIn', false); // Oturum durumunu sıfırla
+
+    await FirebaseAuth.instance.signOut(); // Firebase'den çıkış yap
+
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => LoginScreen()),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
-        body: RefreshIndicator(
-          // Ekranı aşağı çekme ile yenileme
-          onRefresh: _fetchNotes, // Yenileme fonksiyonu
-          child: Container(
-            child: _isLoading
-                ? _buildShimmer()
-                : masonryView(
-                    context), // Eğer yükleniyorsa shimmer gösteriyoruz
+          body: RefreshIndicator(
+            // Ekranı aşağı çekme ile yenileme
+            onRefresh: _fetchNotes, // Yenileme fonksiyonu
+            child: Container(
+              child: _isLoading
+                  ? _buildShimmer()
+                  : masonryView(
+                      context), // Eğer yükleniyorsa shimmer gösteriyoruz
+            ),
           ),
-        ),
-        floatingActionButton: floating(context),
-        appBar: AppBar(
-          title: Text("Note App"),
-          backgroundColor: Colors.cyan,
-        ),
-      ),
+          floatingActionButton: floating(context),
+          appBar: AppBar(
+            title: Text("Notebook"),
+            actions: [
+              IconButton(
+                icon: Icon(Icons.logout),
+                onPressed: _logout,
+              ),
+            ],
+          )),
     );
   }
 
@@ -176,7 +218,9 @@ class _NotebookScreenState extends State<NotebookScreen> {
                         onSelected: (value) async {
                           if (value == SampleItem.itemOne) {
                             await deleteNote(
-                                context, note['id']); // Silme işlemi yapılıyor
+                                context,
+                                note['id']
+                                    .toString()); // Silme işlemi yapılıyor
                           }
                         },
                         itemBuilder: (BuildContext context) =>
