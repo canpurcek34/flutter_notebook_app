@@ -45,6 +45,7 @@ dependencies:
   cloud_firestore: ^5.5.0
   shared_preferences: ^2.3.3
   uuid: ^4.5.1
+  flutter_colorpicker: ^1.1.0
 
 
 dev_dependencies:

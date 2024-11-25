@@ -17,56 +17,58 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
   final _titleController = TextEditingController();
   final _noteController = TextEditingController();
   late String _date;
-  String? formattedDate; // Formatlanmış tarih
+  String? formattedDate;
 
   @override
   void initState() {
-    super
-        .initState(); //initialize edip ilgili note cardına tıkladığımızda verilerin o ekrana geçmesini sağlıyor
+    super.initState();
     _titleController.text = widget.note['title'] ?? '';
     _noteController.text = widget.note['note'] ?? '';
-    _date = widget.note['date'] ??
-        DateFormat.yMMMMd('tr_TR')
-            .add_jm()
-            .toString(); //tarih formatı düzenlenecek
+    _date = widget.note['date'] ?? '';
   }
 
   Future<void> updateNote() async {
-    // Tarih formatını başlatıyoruz ve ardından formatlı tarihi alıyoruz
-    await initializeDateFormatting('tr_TR', null); // Yerel ayarları başlat
+    await initializeDateFormatting('tr_TR', null);
     final now = DateTime.now();
-    formattedDate = DateFormat('d MMMM y HH:mm', 'tr_TR')
-        .format(now); // Tarihi formatlıyoruz
+    formattedDate = DateFormat('d MMMM y HH:mm', 'tr_TR').format(now);
 
-    // HTTP POST isteği gönderiliyor
     final response = await http.post(
-      Uri.parse('https://emrecanpurcek.com.tr/projects/methods/note/update.php'),
+      Uri.parse(
+          'https://emrecanpurcek.com.tr/projects/methods/note/update.php'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
       body: jsonEncode(<String, String>{
-        'id': widget.note['id'], // Notun ID'si
-        'title': _titleController.text, // Güncellenmiş başlık
-        'note': _noteController.text, // Güncellenmiş not
-        'date':
-            formattedDate ?? now.toString(), // Formatlanmış tarihi gönderiyoruz
+        'id': widget.note['id'].toString(),
+        'title': _titleController.text,
+        'note': _noteController.text,
+        'date': formattedDate ?? now.toString(),
       }),
     );
 
-    // Gelen cevabı işliyoruz
     final data = json.decode(response.body);
 
     if (data['success'] == 1) {
-      Navigator.pop(context, true); // Başarılı ise geri dön
-      print("Veri güncellenmesi başarılı");
-    } else {
+      // Güncelleme başarılı, NotebookScreen'e geri dönüyoruz
+      Navigator.pop(context, true);
+
+      // Snackbar ile mesaj göster
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Hata: ${data['message']}'),
+          content: const Text('Not güncellendi.'),
+          backgroundColor: Colors.green,
           behavior: SnackBarBehavior.floating,
         ),
       );
-      print("Veri güncellenmesi başarısız");
+    } else {
+      // Güncelleme başarısız, kullanıcıya hata mesajı göster
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Hata: ${data['message']}'),
+          backgroundColor: Colors.red,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
     }
   }
 
@@ -75,26 +77,14 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
     final id = widget.note['id'];
     return Scaffold(
       appBar: AppBar(
-        title: Text('Düzenle'),
-        actions: [
-          /*IconButton(
-            icon: Icon(Icons.save),
-            onPressed: () {
-              setState(() {
-                updateNote();
-              });
-            },
-          ),*/
-        ],
+        title: const Text('Düzenle'),
       ),
-      // SingleChildScrollView for scrollable content
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Title TextField
               Container(
                 decoration: BoxDecoration(
                   color: Colors.white,
@@ -104,16 +94,15 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
                       color: Colors.grey.withOpacity(0.5),
                       spreadRadius: 2,
                       blurRadius: 5,
-                      offset: Offset(0, 3), // Gölgenin konumu
+                      offset: const Offset(0, 3),
                     ),
                   ],
                 ),
                 child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16),
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: TextField(
                     controller: _titleController,
-                    decoration: InputDecoration(
-                      //labelText: 'Title',
+                    decoration: const InputDecoration(
                       border: InputBorder.none,
                       labelStyle: TextStyle(
                         fontSize: 20.0,
@@ -123,8 +112,7 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
                   ),
                 ),
               ),
-              SizedBox(height: 16),
-              // Note TextField
+              const SizedBox(height: 16),
               Container(
                 decoration: BoxDecoration(
                   color: Colors.white,
@@ -134,34 +122,31 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
                       color: Colors.grey.withOpacity(0.5),
                       spreadRadius: 2,
                       blurRadius: 5,
-                      offset: Offset(0, 3),
+                      offset: const Offset(0, 3),
                     ),
                   ],
                 ),
                 child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16),
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: TextField(
                     controller: _noteController,
-                    decoration: InputDecoration(
-                      //labelText: 'Note',
+                    decoration: const InputDecoration(
                       border: InputBorder.none,
                       labelStyle: TextStyle(
                         fontSize: 20.0,
                         color: Colors.black,
                       ),
                     ),
-                    minLines: 1, // Minimum satır sayısı
-                    maxLines: null, // Metin büyüdükçe yüksekliği artırır
-                    expands: false, // Dinamik genişlemeyi sağlar
+                    minLines: 1,
+                    maxLines: null,
+                    expands: false,
                   ),
                 ),
               ),
-              SizedBox(height: 16),
-              // Date and ID in a Row
+              const SizedBox(height: 16),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  // Date Container
                   Expanded(
                     child: Container(
                       decoration: BoxDecoration(
@@ -172,22 +157,22 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
                             color: Colors.grey.withOpacity(0.5),
                             spreadRadius: 2,
                             blurRadius: 5,
-                            offset: Offset(0, 3),
+                            offset: const Offset(0, 3),
                           ),
                         ],
                       ),
                       child: Padding(
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 16),
                         child: Text(
                           'Düzenlenme Zamanı: $_date',
-                          style: TextStyle(fontSize: 16, color: Colors.black),
+                          style: const TextStyle(
+                              fontSize: 16, color: Colors.black),
                         ),
                       ),
                     ),
                   ),
-                  SizedBox(width: 16),
-                  // ID Container
+                  const SizedBox(width: 16),
                   Expanded(
                     child: Container(
                       decoration: BoxDecoration(
@@ -198,31 +183,29 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
                             color: Colors.grey.withOpacity(0.5),
                             spreadRadius: 2,
                             blurRadius: 5,
-                            offset: Offset(0, 3),
+                            offset: const Offset(0, 3),
                           ),
                         ],
                       ),
                       child: Padding(
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 16),
                         child: Text(
                           'id: $id',
-                          style: TextStyle(fontSize: 16, color: Colors.black),
+                          style: const TextStyle(
+                              fontSize: 16, color: Colors.black),
                         ),
                       ),
                     ),
                   ),
                 ],
               ),
-              SizedBox(height: 20),
-              // Save Button
+              const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: () {
                   updateNote();
-
-                  print(_titleController.text);
                 },
-                child: Text('Kaydet'),
+                child: const Text('Kaydet'),
               ),
             ],
           ),
