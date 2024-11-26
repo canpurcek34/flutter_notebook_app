@@ -144,35 +144,35 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
                 ),
               ),
               const SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              Wrap(
+                spacing: 8.0, // Aralık
+                runSpacing: 4.0, // Satır arası aralık
                 children: [
-                  IntrinsicWidth(
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(8),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey.withOpacity(0.5),
-                            spreadRadius: 2,
-                            blurRadius: 5,
-                            offset: const Offset(0, 3),
-                          ),
-                        ],
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 16),
-                        child: Text(
-                          'Düzenlenme Zamanı: $_date',
-                          style: const TextStyle(
-                              fontSize: 16, color: Colors.black),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(8),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.5),
+                          spreadRadius: 2,
+                          blurRadius: 5,
+                          offset: const Offset(0, 3),
                         ),
+                      ],
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 16),
+                      child: Text(
+                        'Düzenlenme Zamanı: $_date',
+                        style:
+                            const TextStyle(fontSize: 16, color: Colors.black),
+                        softWrap: true,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
                   ),
-                  const SizedBox(width: 16),
                 ],
               ),
               const SizedBox(height: 20),

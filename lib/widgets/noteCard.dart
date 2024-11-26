@@ -46,19 +46,24 @@ class NoteCard extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    dateTime,
-                    style: const TextStyle(
-                      color: Colors.orangeAccent,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
+                  // Tarih ve Saat
+                  Flexible(
+                    child: Text(
+                      dateTime,
+                      style: const TextStyle(
+                        color: Colors.orangeAccent,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis, // Uzun metin kısaltılır
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(width: 8),
                   PopupMenuButton(
                     onSelected: (value) {
                       if (value == SampleItem.itemOne) {
-                        onDelete(id); // Silme işlemi için callback çağrılıyor
+                        onDelete(id); // Silme işlemi için callback
                       } else if (value == SampleItem.itemThree) {
                         _showColorPicker(context); // Renk seçimi başlatılıyor
                       }
