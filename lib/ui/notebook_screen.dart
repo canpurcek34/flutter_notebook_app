@@ -8,6 +8,14 @@ import 'dart:convert';
 import 'package:shimmer/shimmer.dart';
 import 'add_note_screen.dart';
 
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'dart:io' show Platform;
+
+bool isMobile() {
+  if (kIsWeb) return false; // Web için masaüstü davranışı
+  return Platform.isAndroid || Platform.isIOS; // Mobil platformlar
+}
+
 class NotebookScreen extends StatefulWidget {
   const NotebookScreen({super.key});
 
@@ -23,6 +31,19 @@ class NotebookScreenState extends State<NotebookScreen> {
   void initState() {
     super.initState();
     fetchNotes();
+  }
+
+  void _openEditNotePopup(BuildContext context, Map<String, dynamic> note) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        content: SizedBox(
+          width: 500, // Popup genişliği (masaüstü için uygun)
+          child: EditNoteScreen(
+              note: note), // Düzenleme ekranını burada çağırıyoruz
+        ),
+      ),
+    );
   }
 
   Future<void> fetchNotes() async {
@@ -139,17 +160,20 @@ class NotebookScreenState extends State<NotebookScreen> {
             fetchNotes(); // Silmeden sonra notları yenile
           },
           onEdit: (id) async {
-            // EditNoteScreen'e geçiş yap
-            final result = await Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => EditNoteScreen(note: note),
-              ),
-            );
-
-            // Geri döndüğünde sonucu kontrol et
-            if (result == true) {
-              fetchNotes(); // Notlar güncellenir
+            final note = _notes.firstWhere((n) => n['id'].toString() == id);
+            if (isMobile()) {
+              // Mobilde tam ekran navigasyon
+              final result = await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => EditNoteScreen(note: note),
+                ),
+              );
+              if (result == true)
+                fetchNotes(); // Geri döndüğünde notları yenile
+            } else {
+              // Masaüstü için popup
+              _openEditNotePopup(context, note);
             }
           },
         );
