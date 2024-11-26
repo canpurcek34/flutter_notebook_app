@@ -147,7 +147,7 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Expanded(
+                  IntrinsicWidth(
                     child: Container(
                       decoration: BoxDecoration(
                         color: Colors.white,
@@ -173,31 +173,6 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
                     ),
                   ),
                   const SizedBox(width: 16),
-                  Expanded(
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(8),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey.withOpacity(0.5),
-                            spreadRadius: 2,
-                            blurRadius: 5,
-                            offset: const Offset(0, 3),
-                          ),
-                        ],
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 16),
-                        child: Text(
-                          'id: $id',
-                          style: const TextStyle(
-                              fontSize: 16, color: Colors.black),
-                        ),
-                      ),
-                    ),
-                  ),
                 ],
               ),
               const SizedBox(height: 20),
