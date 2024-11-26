@@ -144,7 +144,8 @@ class NotebookScreenState extends State<NotebookScreen> {
                       final result = await Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => AddNoteScreen()),
+                            builder: (context) =>
+                                AddNoteScreen()), //edit list screen route eklenecek
                       );
                       if (result == true) fetchNotes();
                     },
@@ -174,6 +175,7 @@ class NotebookScreenState extends State<NotebookScreen> {
       ),
       itemCount: _notes.length,
       itemBuilder: (context, index) {
+        //list card item eklenecek
         final note = _notes[index];
         return NoteCard(
           id: note['id'].toString(), // Not ID'sini aktar
@@ -194,7 +196,8 @@ class NotebookScreenState extends State<NotebookScreen> {
               final result = await Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => EditNoteScreen(note: note),
+                  builder: (context) =>
+                      EditNoteScreen(note: note), //list card route eklenecek
                 ),
               );
               if (result == true)

@@ -64,18 +64,18 @@ class NoteCard extends StatelessWidget {
                     onSelected: (value) {
                       if (value == SampleItem.itemOne) {
                         onDelete(id); // Silme işlemi için callback
-                      } else if (value == SampleItem.itemThree) {
+                      } else if (value == SampleItem.itemTwo) {
                         _showColorPicker(context); // Renk seçimi başlatılıyor
                       }
                     },
                     itemBuilder: (BuildContext context) =>
                         <PopupMenuEntry<SampleItem>>[
                       const PopupMenuItem<SampleItem>(
-                        value: SampleItem.itemTwo,
+                        value: SampleItem.itemOne,
                         child: Text('Delete'),
                       ),
                       const PopupMenuItem<SampleItem>(
-                        value: SampleItem.itemThree,
+                        value: SampleItem.itemTwo,
                         child: Text('Renk Seç'),
                       ),
                     ],
