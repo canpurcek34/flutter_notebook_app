@@ -119,12 +119,40 @@ class NotebookScreenState extends State<NotebookScreen> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          final result = await Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => AddNoteScreen()),
+        onPressed: () {
+          showModalBottomSheet(
+            context: context,
+            builder: (BuildContext context) {
+              return Wrap(
+                children: [
+                  ListTile(
+                    leading: const Icon(Icons.note_add),
+                    title: const Text('Yeni Not Ekle'),
+                    onTap: () async {
+                      final result = await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => AddNoteScreen()),
+                      );
+                      if (result == true) fetchNotes();
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.check_box),
+                    title: const Text('Yeni Liste Ekle'),
+                    onTap: () async {
+                      final result = await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => AddNoteScreen()),
+                      );
+                      if (result == true) fetchNotes();
+                    },
+                  ),
+                ],
+              );
+            },
           );
-          if (result == true) fetchNotes();
         },
         child: const Icon(Icons.add),
       ),
