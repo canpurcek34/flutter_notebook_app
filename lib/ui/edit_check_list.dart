@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:notebook_app/widgets/ChecklistItem.dart';
+import 'package:notebook_app/widgets/checkListItem.dart';
 
 class EditChecklistScreen extends StatefulWidget {
   final Function(String, String, List<ChecklistItem>) onSave;

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:notebook_app/widgets/ChecklistItem.dart';
+import 'package:notebook_app/widgets/checkListItem.dart';
 
 class ChecklistCard extends StatelessWidget {
   final String id;
