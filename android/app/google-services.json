@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "829784233537",
+    "project_id": "note-app-5a74a",
+    "storage_bucket": "note-app-5a74a.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:829784233537:android:a95031bd223c05aa5d98c0",
+        "android_client_info": {
+          "package_name": "com.canpurcek.flutternotebook"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBdNtuYZM50v6VyKlOS-dZ6B8K6s3tiVJ0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
