@@ -26,6 +26,7 @@ class _NotebookScreenState extends State<NotebookScreen>
   List<dynamic> _notes = [];
   List<dynamic> _lists = [];
   bool isLoading = true;
+  int screenWidth = 1000;
 
   final List<Map<String, dynamic>> _checklists = [];
 
@@ -199,10 +200,19 @@ class _NotebookScreenState extends State<NotebookScreen>
 
   Widget _buildNotesTab() {
     // Notlar için Staggered GridView
+    int cross = 1;
+    final screenWidth = MediaQuery.of(context).size.width;
+    if (screenWidth < 600) {
+      cross = 1;
+    } else if (screenWidth < 1000) {
+      cross = 2;
+    } else {
+      cross = 4;
+    }
 
     return MasonryGridView.builder(
-      gridDelegate: const SliverSimpleGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 1,
+      gridDelegate: SliverSimpleGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: cross,
       ),
       itemCount: _notes.length,
       itemBuilder: (context, index) {
