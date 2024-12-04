@@ -23,12 +23,15 @@ class _MobileNotebookScreenState extends State<MobileNotebookScreen>
   @override
   void initState() {
     fetchNotes();
+    fetchLists();
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
   }
 
   @override
   void dispose() {
+    fetchNotes();
+    fetchLists();
     _tabController?.dispose();
     super.dispose();
   }
@@ -70,6 +73,21 @@ class _MobileNotebookScreenState extends State<MobileNotebookScreen>
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Not başarıyla silindi.'),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    } catch (e) {
+      _showError(e.toString());
+    }
+  }
+
+  Future<void> deleteList(String id) async {
+    try {
+      await _appService.deleteList(id);
+      fetchNotes();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Liste başarıyla silindi.'),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -127,7 +145,7 @@ class _MobileNotebookScreenState extends State<MobileNotebookScreen>
                 context,
                 MaterialPageRoute(builder: (context) => AddListScreen()),
               );
-              if (result == true) fetchNotes();
+              if (result == true) fetchLists();
             },
           )
         ],
@@ -152,7 +170,7 @@ class _MobileNotebookScreenState extends State<MobileNotebookScreen>
           ),
           ListsTab(
               lists: _lists,
-              onDelete: deleteNote,
+              onDelete: deleteList,
               onEdit: (id) async {
                 final list = _lists.firstWhere((n) => n['id'].toString() == id);
                 final result = await Navigator.push(

@@ -87,6 +87,21 @@ class _DesktopNotebookScreenState extends State<DesktopNotebookScreen>
     }
   }
 
+  Future<void> deleteList(String id) async {
+    try {
+      await _appService.deleteList(id);
+      fetchNotes();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Liste başarıyla silindi.'),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    } catch (e) {
+      _showError(e.toString());
+    }
+  }
+
   void _openEditNotePopup(BuildContext context, Map<String, dynamic> note) {
     showDialog(
       context: context,
@@ -149,7 +164,7 @@ class _DesktopNotebookScreenState extends State<DesktopNotebookScreen>
                 context,
                 MaterialPageRoute(builder: (context) => AddListScreen()),
               );
-              if (result == true) fetchNotes();
+              if (result == true) fetchLists();
             },
           )
         ],
@@ -174,7 +189,7 @@ class _DesktopNotebookScreenState extends State<DesktopNotebookScreen>
           ),
           ListsTab(
               lists: _lists,
-              onDelete: deleteNote,
+              onDelete: deleteList,
               onEdit: (id) async {
                 final list = _lists.firstWhere((n) => n['id'].toString() == id);
                 final result = await Navigator.push(

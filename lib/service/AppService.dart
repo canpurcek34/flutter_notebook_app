@@ -99,7 +99,17 @@ class AppService {
   /// Firebase Firestore'dan bir not silme işlemi
   Future<void> deleteList(String id) async {
     try {
-      await _firestore.collection('list').doc(id).delete();
+      final response = await http.post(
+        Uri.parse(
+            'https://emrecanpurcek.com.tr/projects/methods/list/delete.php'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({'id': id}),
+      );
+
+      final data = json.decode(response.body);
+      if (data['success'] != 1) {
+        throw Exception(data['message']);
+      }
     } catch (e) {
       throw Exception(_handleError(e));
     }
