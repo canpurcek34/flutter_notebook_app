@@ -3,7 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
-class NotebookService {
+class AppService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
@@ -24,11 +24,14 @@ class NotebookService {
     try {
       final user = _getCurrentUser();
       final uid = user!.uid;
+      const type = "note";
 
+      // API çağrısını yap
       final response = await http.post(
         Uri.parse('https://emrecanpurcek.com.tr/projects/methods/note/get.php'),
         headers: {'Content-Type': 'application/json'},
-        body: json.encode({'uuid': uid}),
+        body: json
+            .encode({'uuid': uid, 'type': type}), // UUID ve Type gönderiliyor
       );
 
       if (response.statusCode == 200) {
@@ -47,22 +50,28 @@ class NotebookService {
   }
 
   /// Notları çekmek için kullanılan metod (Firebase Firestore ile)
-  Future<List<Map<String, dynamic>>> fetchLists() async {
+  Future<List<dynamic>> fetchLists() async {
     try {
       final user = _getCurrentUser();
       final uid = user!.uid;
+      const type = "list";
 
-      final snapshot = await _firestore
-          .collection('list')
-          .where('uuid', isEqualTo: uid)
-          .get();
+      final response = await http.post(
+        Uri.parse('https://emrecanpurcek.com.tr/projects/methods/list/get.php'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({'uuid': uid, 'type': type}),
+      );
 
-      return snapshot.docs
-          .map((doc) => {
-                'id': doc.id, // Belge ID'si
-                ...doc.data(), // Diğer alanlar
-              })
-          .toList();
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (data['success'] == 1) {
+          return data['data'];
+        } else {
+          throw Exception(data['message']);
+        }
+      } else {
+        throw Exception('HTTP Hata Kodu: ${response.statusCode}');
+      }
     } catch (e) {
       throw Exception(_handleError(e));
     }

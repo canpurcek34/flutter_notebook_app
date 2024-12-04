@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
+import 'package:notebook_app/ui/AddListScreen.dart';
 import 'package:notebook_app/ui/EditNoteScreen.dart';
 import '../widgets/NotesTab.dart';
 import '../widgets/ListsTab.dart';
-import '../service/NoteService.dart';
+import '../service/AppService.dart';
 import 'AddNoteScreen.dart';
 
 class MobileNotebookScreen extends StatefulWidget {
@@ -12,7 +14,7 @@ class MobileNotebookScreen extends StatefulWidget {
 
 class _MobileNotebookScreenState extends State<MobileNotebookScreen>
     with SingleTickerProviderStateMixin {
-  final NotebookService _notebookService = NotebookService();
+  final AppService _appService = AppService();
   List<dynamic> _notes = [];
   List<dynamic> _lists = [];
   TabController? _tabController;
@@ -33,7 +35,7 @@ class _MobileNotebookScreenState extends State<MobileNotebookScreen>
 
   Future<void> fetchNotes() async {
     try {
-      final notes = await _notebookService.fetchNotes();
+      final notes = await _appService.fetchNotes();
       setState(() {
         _notes = notes;
         isLoading = false;
@@ -49,9 +51,21 @@ class _MobileNotebookScreenState extends State<MobileNotebookScreen>
     );
   }
 
+  Future<void> fetchLists() async {
+    try {
+      final lists = await _appService.fetchLists();
+      setState(() {
+        _lists = lists;
+        isLoading = false;
+      });
+    } catch (e) {
+      _showError(e.toString());
+    }
+  }
+
   Future<void> deleteNote(String id) async {
     try {
-      await _notebookService.deleteNote(id);
+      await _appService.deleteNote(id);
       fetchNotes();
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -87,15 +101,36 @@ class _MobileNotebookScreenState extends State<MobileNotebookScreen>
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          final result = await Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => AddNoteScreen()),
-          );
-          if (result == true) fetchNotes();
-        },
-        child: const Icon(Icons.add),
+      floatingActionButton: SpeedDial(
+        animatedIcon: AnimatedIcons.menu_close,
+        backgroundColor: Colors.cyan,
+        overlayOpacity: 0.1,
+        children: [
+          SpeedDialChild(
+            child: const Icon(Icons.note_add, color: Colors.white),
+            backgroundColor: Colors.cyan,
+            label: 'Yeni Not Ekle',
+            onTap: () async {
+              final result = await Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => AddNoteScreen()),
+              );
+              if (result == true) fetchNotes();
+            },
+          ),
+          SpeedDialChild(
+            child: const Icon(Icons.list, color: Colors.white),
+            backgroundColor: Colors.cyan,
+            label: 'Yeni Liste Ekle',
+            onTap: () async {
+              final result = await Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => AddListScreen()),
+              );
+              if (result == true) fetchNotes();
+            },
+          )
+        ],
       ),
       body: TabBarView(
         controller: _tabController,
@@ -116,13 +151,24 @@ class _MobileNotebookScreenState extends State<MobileNotebookScreen>
             },
           ),
           ListsTab(
-            crossCount: cross,
-            lists: _lists,
-            isLoading: isLoading,
-            fetchNotes: fetchNotes,
-          ),
+              lists: _lists,
+              onDelete: deleteNote,
+              onEdit: (id) async {
+                final list = _lists.firstWhere((n) => n['id'].toString() == id);
+                final result = await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        EditNoteScreen(note: list), //iyileştirilecek
+                  ),
+                );
+                if (result == true) fetchLists();
+              },
+              crossCount: 1)
         ],
       ),
     );
   }
+
+  void onChanged(bool bool) {}
 }
