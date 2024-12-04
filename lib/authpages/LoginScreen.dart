@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:notebook_app/ui/Notebook.dart';
+import 'package:notebook_app/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -30,7 +30,7 @@ class _LoginScreenState extends State<LoginScreen> {
       // Oturum açık ise direkt NoteScreen'e yönlendir
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => NotebookScreen()),
+        MaterialPageRoute(builder: (context) => HomeScreen()),
       );
     }
   }
@@ -53,7 +53,7 @@ class _LoginScreenState extends State<LoginScreen> {
       // Giriş başarılı, Notebook ekranına yönlendir
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => NotebookScreen()),
+        MaterialPageRoute(builder: (context) => HomeScreen()),
       );
 
       if (user != null && !user.emailVerified) {
@@ -68,7 +68,7 @@ class _LoginScreenState extends State<LoginScreen> {
         // Giriş başarılı, Notebook ekranına yönlendir
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => NotebookScreen()),
+          MaterialPageRoute(builder: (context) => HomeScreen()),
         );
       }
     } catch (e) {

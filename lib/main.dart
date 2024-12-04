@@ -1,7 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:notebook_app/ui/Notebook.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:notebook_app/ui/DesktopNotebookScreen.dart';
+import 'package:notebook_app/ui/MobileNotebookScreen.dart';
 
 import 'authpages/AuthScreen.dart';
 import 'authpages/LoginScreen.dart';
@@ -13,10 +13,12 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  runApp(MyApp());
+  runApp(NotebookApp());
 }
 
-class MyApp extends StatelessWidget {
+// ignore: must_be_immutable
+class NotebookApp extends StatelessWidget {
+  int screenWidth = 1;
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -28,8 +30,23 @@ class MyApp extends StatelessWidget {
         '/auth': (context) => AuthScreen(),
         '/signup': (context) => SignUpScreen(),
         '/login': (context) => LoginScreen(),
-        '/notebook': (context) => NotebookScreen(),
+        '/home': (context) => HomeScreen()
       },
     );
+  }
+}
+
+class HomeScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+
+    if (screenWidth < 600) {
+      // Mobil ekran
+      return MobileNotebookScreen();
+    } else {
+      // Masaüstü ekran
+      return DesktopNotebookScreen();
+    }
   }
 }
