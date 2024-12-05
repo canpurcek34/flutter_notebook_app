@@ -77,6 +77,32 @@ class AppService {
     }
   }
 
+  Future<void> updateCheckbox(int id, bool isChecked) async {
+  final response = await http.post(
+    Uri.parse("https://yourdomain.com/update.php"),
+    body: jsonEncode({
+      'id': id,
+      'isChecked': isChecked,
+    }),
+    headers: {'Content-Type': 'application/json'},
+  );
+
+  if (response.statusCode == 200) {
+    final data = jsonDecode(response.body);
+    if (data['success'] == 1) {
+      print("Checkbox durumu güncellendi");
+    } else {
+      print("Hata: ${data['message']}");
+    }
+  } else {
+    print("Server error: ${response.statusCode}");
+  }
+}
+
+
+  
+
+
   /// Sunucudan not silme işlemi
   Future<void> deleteNote(String id) async {
     try {

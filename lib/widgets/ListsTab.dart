@@ -7,13 +7,15 @@ class ListsTab extends StatelessWidget {
   final Function(String id) onDelete;
   final Function(String id) onEdit;
   final int crossCount;
+  final List<bool> onChecked;
 
   const ListsTab(
       {super.key,
       required this.lists,
       required this.onDelete,
       required this.onEdit,
-      required this.crossCount});
+      required this.crossCount,
+      required this.onChecked});
 
   @override
   Widget build(BuildContext context) {

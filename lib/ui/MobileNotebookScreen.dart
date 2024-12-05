@@ -19,6 +19,7 @@ class _MobileNotebookScreenState extends State<MobileNotebookScreen>
   List<dynamic> _lists = [];
   TabController? _tabController;
   bool isLoading = true;
+  List<bool> _isChecked = [];
 
   @override
   void initState() {
@@ -59,6 +60,9 @@ class _MobileNotebookScreenState extends State<MobileNotebookScreen>
       final lists = await _appService.fetchLists();
       setState(() {
         _lists = lists;
+        // Explicitly cast to List<bool>
+        _isChecked =
+            lists.map<bool>((list) => list.isChecked ?? false).toList();
         isLoading = false;
       });
     } catch (e) {
@@ -171,6 +175,7 @@ class _MobileNotebookScreenState extends State<MobileNotebookScreen>
           ListsTab(
               lists: _lists,
               onDelete: deleteList,
+              onChecked: _isChecked,
               onEdit: (id) async {
                 final list = _lists.firstWhere((n) => n['id'].toString() == id);
                 final result = await Navigator.push(

@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:notebook_app/ui/AddListScreen.dart';
@@ -25,6 +27,7 @@ class _DesktopNotebookScreenState extends State<DesktopNotebookScreen>
   List<dynamic> _lists = [];
   TabController? _tabController;
   bool isLoading = true;
+  List<bool> _isChecked = [];
 
   @override
   void initState() {
@@ -59,6 +62,8 @@ class _DesktopNotebookScreenState extends State<DesktopNotebookScreen>
       final lists = await _appService.fetchLists();
       setState(() {
         _lists = lists;
+        // Explicitly cast to List<bool>
+        _isChecked = lists.map<bool>((list) => list.isChecked ?? false).toList();
         isLoading = false;
       });
     } catch (e) {
@@ -71,6 +76,7 @@ class _DesktopNotebookScreenState extends State<DesktopNotebookScreen>
       SnackBar(content: Text(message), behavior: SnackBarBehavior.floating),
     );
   }
+  
 
   Future<void> deleteNote(String id) async {
     try {
@@ -190,6 +196,7 @@ class _DesktopNotebookScreenState extends State<DesktopNotebookScreen>
           ListsTab(
               lists: _lists,
               onDelete: deleteList,
+              onChecked: _isChecked,
               onEdit: (id) async {
                 final list = _lists.firstWhere((n) => n['id'].toString() == id);
                 final result = await Navigator.push(
@@ -206,6 +213,4 @@ class _DesktopNotebookScreenState extends State<DesktopNotebookScreen>
       ),
     );
   }
-
-  void onChanged(bool bool) {}
 }
