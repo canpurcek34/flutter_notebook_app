@@ -1,16 +1,18 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:intl/date_symbol_data_local.dart';
+import 'package:intl/intl.dart';
 
 class AppService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   /// Hata mesajı döndüren yardımcı bir metod
   String _handleError(dynamic error) {
     return error.toString();
   }
+
+  String? formattedDate;
 
   /// Kullanıcı doğrulamasını kontrol eden yardımcı bir metod
   User? _getCurrentUser() {
@@ -77,31 +79,35 @@ class AppService {
     }
   }
 
-  Future<void> updateCheckbox(int id, bool isChecked) async {
-  final response = await http.post(
-    Uri.parse("https://yourdomain.com/update.php"),
-    body: jsonEncode({
-      'id': id,
-      'isChecked': isChecked,
-    }),
-    headers: {'Content-Type': 'application/json'},
-  );
+  Future<void> updateCheckbox(String id, bool value) async {
+    await initializeDateFormatting('tr_TR', null);
+    final now = DateTime.now();
+    formattedDate = DateFormat('d MMMM y HH:mm', 'tr_TR').format(now);
 
-  if (response.statusCode == 200) {
-    final data = jsonDecode(response.body);
-    if (data['success'] == 1) {
-      print("Checkbox durumu güncellendi");
-    } else {
-      print("Hata: ${data['message']}");
+    final isChecked = value ? 1 : 0;
+
+    try {
+      final response = await http.post(
+        Uri.parse(
+            'https://emrecanpurcek.com.tr/projects/methods/list/check.php'),
+        headers: {
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode({
+          'id': id,
+          'date': formattedDate ?? now.toString(),
+          'isChecked': isChecked,
+        }),
+      );
+
+      final data = json.decode(response.body);
+      if (data['success'] != 1) {
+        throw Exception(data['message']);
+      }
+    } catch (e) {
+      throw Exception(_handleError(e));
     }
-  } else {
-    print("Server error: ${response.statusCode}");
   }
-}
-
-
-  
-
 
   /// Sunucudan not silme işlemi
   Future<void> deleteNote(String id) async {

@@ -6,22 +6,25 @@ class ListsTab extends StatelessWidget {
   final List<dynamic> lists;
   final Function(String id) onDelete;
   final Function(String id) onEdit;
+  final Function(String id, bool value) onChanged;
   final int crossCount;
-  final List<bool> onChecked;
+  bool isChecked;
 
-  const ListsTab(
+  ListsTab(
       {super.key,
       required this.lists,
       required this.onDelete,
       required this.onEdit,
       required this.crossCount,
-      required this.onChecked});
+      required this.onChanged,
+      required this.isChecked});
 
   @override
   Widget build(BuildContext context) {
     int cross = crossCount;
 
     return MasonryGridView.builder(
+      padding: EdgeInsets.only(bottom: 90),
       gridDelegate: SliverSimpleGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: cross,
       ),
@@ -29,13 +32,12 @@ class ListsTab extends StatelessWidget {
       itemBuilder: (context, index) {
         final list = lists[index];
         return ListCard(
-          id: list['id'].toString(),
-          listItem: list['list'],
-          isChecked: false,
-          onDelete: onDelete,
-          onCheckboxChanged: (id, value) =>
-              print('Checkbox değişti: $id - $value'),
-        );
+            id: list['id'].toString(),
+            listItem: list['list'],
+            isChecked: list['isChecked'],
+            onDelete: onDelete,
+            onCheckboxChanged: onChanged,
+            onEdit: onEdit);
       },
     );
   }

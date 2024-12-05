@@ -19,7 +19,7 @@ class _MobileNotebookScreenState extends State<MobileNotebookScreen>
   List<dynamic> _lists = [];
   TabController? _tabController;
   bool isLoading = true;
-  List<bool> _isChecked = [];
+  bool isChecked = false;
 
   @override
   void initState() {
@@ -60,9 +60,18 @@ class _MobileNotebookScreenState extends State<MobileNotebookScreen>
       final lists = await _appService.fetchLists();
       setState(() {
         _lists = lists;
-        // Explicitly cast to List<bool>
-        _isChecked =
-            lists.map<bool>((list) => list.isChecked ?? false).toList();
+        isLoading = false;
+      });
+    } catch (e) {
+      _showError(e.toString());
+    }
+  }
+
+  Future<void> updateCheckbox(String id, bool value) async {
+    try {
+      await _appService.updateCheckbox(id, value);
+      setState(() {
+        fetchLists();
         isLoading = false;
       });
     } catch (e) {
@@ -173,21 +182,27 @@ class _MobileNotebookScreenState extends State<MobileNotebookScreen>
             },
           ),
           ListsTab(
-              lists: _lists,
-              onDelete: deleteList,
-              onChecked: _isChecked,
-              onEdit: (id) async {
-                final list = _lists.firstWhere((n) => n['id'].toString() == id);
-                final result = await Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        EditNoteScreen(note: list), //iyileştirilecek
-                  ),
-                );
-                if (result == true) fetchLists();
-              },
-              crossCount: 1)
+            lists: _lists,
+            onDelete: deleteList,
+            isChecked: isChecked,
+            onEdit: (id) async {
+              final list = _lists.firstWhere((n) => n['id'].toString() == id);
+              final result = await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                      EditNoteScreen(note: list), //iyileştirilecek
+                ),
+              );
+              if (result == true) fetchLists();
+            },
+            crossCount: 1,
+            onChanged: (String id, bool value) {
+              setState(() {
+                updateCheckbox(id, value);
+              });
+            },
+          )
         ],
       ),
     );

@@ -1,8 +1,7 @@
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:notebook_app/ui/AddListScreen.dart';
+import 'package:notebook_app/ui/EditListScreen.dart';
 import 'package:notebook_app/widgets/ListsTab.dart';
 import 'package:notebook_app/widgets/NotesTab.dart';
 import '../service/AppService.dart';
@@ -27,7 +26,7 @@ class _DesktopNotebookScreenState extends State<DesktopNotebookScreen>
   List<dynamic> _lists = [];
   TabController? _tabController;
   bool isLoading = true;
-  List<bool> _isChecked = [];
+  bool isChecked = false;
 
   @override
   void initState() {
@@ -62,8 +61,6 @@ class _DesktopNotebookScreenState extends State<DesktopNotebookScreen>
       final lists = await _appService.fetchLists();
       setState(() {
         _lists = lists;
-        // Explicitly cast to List<bool>
-        _isChecked = lists.map<bool>((list) => list.isChecked ?? false).toList();
         isLoading = false;
       });
     } catch (e) {
@@ -76,7 +73,18 @@ class _DesktopNotebookScreenState extends State<DesktopNotebookScreen>
       SnackBar(content: Text(message), behavior: SnackBarBehavior.floating),
     );
   }
-  
+
+  Future<void> updateCheckbox(String id, bool value) async {
+    try {
+      await _appService.updateCheckbox(id, value);
+      setState(() {
+        fetchLists();
+        isLoading = false;
+      });
+    } catch (e) {
+      _showError(e.toString());
+    }
+  }
 
   Future<void> deleteNote(String id) async {
     try {
@@ -96,7 +104,7 @@ class _DesktopNotebookScreenState extends State<DesktopNotebookScreen>
   Future<void> deleteList(String id) async {
     try {
       await _appService.deleteList(id);
-      fetchNotes();
+      fetchLists();
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Liste başarıyla silindi.'),
@@ -106,19 +114,6 @@ class _DesktopNotebookScreenState extends State<DesktopNotebookScreen>
     } catch (e) {
       _showError(e.toString());
     }
-  }
-
-  void _openEditNotePopup(BuildContext context, Map<String, dynamic> note) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        content: SizedBox(
-          width: 500, // Popup genişliği (masaüstü için uygun)
-          child: EditNoteScreen(
-              note: note), // Düzenleme ekranını burada çağırıyoruz
-        ),
-      ),
-    );
   }
 
   @override
@@ -194,21 +189,27 @@ class _DesktopNotebookScreenState extends State<DesktopNotebookScreen>
             },
           ),
           ListsTab(
-              lists: _lists,
-              onDelete: deleteList,
-              onChecked: _isChecked,
-              onEdit: (id) async {
-                final list = _lists.firstWhere((n) => n['id'].toString() == id);
-                final result = await Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        EditNoteScreen(note: list), //iyileştirilecek
-                  ),
-                );
-                if (result == true) fetchLists();
-              },
-              crossCount: 1)
+            lists: _lists,
+            onDelete: deleteList,
+            isChecked: isChecked,
+            onEdit: (id) async {
+              final list = _lists.firstWhere((n) => n['id'].toString() == id);
+              final result = await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                      EditListScreen(list: list), //iyileştirilecek
+                ),
+              );
+              if (result == true) fetchLists();
+            },
+            crossCount: 1,
+            onChanged: (String id, bool value) {
+              setState(() {
+                updateCheckbox(id, value);
+              });
+            },
+          )
         ],
       ),
     );

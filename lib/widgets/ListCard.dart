@@ -7,6 +7,7 @@ class ListCard extends StatelessWidget {
   final String id; // Not ID'si
   final String listItem;
   final Color cardColor;
+  final Function(String) onEdit;
   final Function(String) onDelete; // Silme işlemi için callback
   final Function(String, bool)
       onCheckboxChanged; // Checkbox durumu değiştiğinde çağrılır
@@ -20,12 +21,15 @@ class ListCard extends StatelessWidget {
     required this.isChecked,
     this.cardColor = Colors.white,
     super.key,
+    required this.onEdit,
   });
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {},
+      onTap: () {
+        onEdit(id);
+      },
       child: Container(
         margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
         decoration: BoxDecoration(
@@ -56,11 +60,11 @@ class ListCard extends StatelessWidget {
               Expanded(
                 child: Text(
                   listItem,
-                  maxLines: 1,
+                  maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
                     color: Colors.black,
-                    fontSize: 18,
+                    fontSize: 16,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
