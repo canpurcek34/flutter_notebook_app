@@ -21,7 +21,7 @@ class NoteCard extends StatelessWidget {
     required this.onDelete, // Silme işlemi için callback'i al
     required this.onEdit, // Düzenleme işlemi için callback'i al
     //required this.onColorChange, // Renk değiştirme callback'i al
-    this.cardColor = Colors.white,
+    required this.cardColor,
     super.key,
   });
 

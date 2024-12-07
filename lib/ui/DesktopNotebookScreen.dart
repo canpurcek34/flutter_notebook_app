@@ -19,6 +19,7 @@ class _DesktopNotebookScreenState extends State<DesktopNotebookScreen>
   final AppService _appService = AppService();
   List<dynamic> _notes = [];
   List<dynamic> _lists = [];
+  List<dynamic> _colors = [];
   TabController? _tabController;
   bool isLoading = true;
   bool isChecked = false;
@@ -166,7 +167,30 @@ class _DesktopNotebookScreenState extends State<DesktopNotebookScreen>
 
   Future<void> fetchLists() async {
     try {
+      // Sunucudan listeleri çek
       final lists = await _appService.fetchLists();
+
+      // Renk haritası
+      Map<String, Color> colorNames = {
+        "red": Colors.red,
+        "blue": Colors.blue,
+        "green": Colors.green,
+        "yellow": Colors.yellow,
+        "black": Colors.black,
+        "white": Colors.white,
+        "orange": Colors.orange,
+        "grey": Colors.grey,
+        "purple": Colors.purple,
+        "cyan": Colors.cyan,
+      };
+
+      // Gelen renk adlarını eşle
+      for (var _colors in lists) {
+        String colorName =
+            _colors['color'] ?? 'white'; // Varsayılan renk 'white'
+        _colors['flutterColor'] = colorNames[colorName] ?? Colors.white;
+      }
+
       setState(() {
         // Son güncelleme tarihine göre sıralama
         _lists = lists..sort((a, b) => b['date'].compareTo(a['date']));

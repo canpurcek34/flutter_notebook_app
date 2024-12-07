@@ -19,7 +19,7 @@ class ListCard extends StatelessWidget {
     required this.onDelete,
     required this.onCheckboxChanged,
     required this.isChecked,
-    this.cardColor = Colors.white,
+    required this.cardColor,
     super.key,
     required this.onEdit,
   });
@@ -74,7 +74,7 @@ class ListCard extends StatelessWidget {
                   if (value == SampleItem.itemOne) {
                     onDelete(id); // Silme işlemi için callback
                   } else if (value == SampleItem.itemTwo) {
-                    _showColorPicker(context); // Renk seçimi başlatılıyor
+                    _showColorPicker(context); // Renk seçimi için callback
                   }
                 },
                 itemBuilder: (BuildContext context) =>
