@@ -60,7 +60,7 @@ class NoteCard extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
                         color: Colors.black,
-                        fontSize: 18,
+                        fontSize: 14,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -95,7 +95,7 @@ class NoteCard extends StatelessWidget {
                       note,
                       style: const TextStyle(
                         color: Colors.black,
-                        fontSize: 16,
+                        fontSize: 14,
                       ),
                     ),
                   ),
@@ -107,7 +107,7 @@ class NoteCard extends StatelessWidget {
                 style: const TextStyle(
                   color: Colors.orangeAccent,
                   fontSize: 14,
-                  fontWeight: FontWeight.w600,
+                  fontWeight: FontWeight.normal,
                 ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis, // Uzun metin kısaltılır

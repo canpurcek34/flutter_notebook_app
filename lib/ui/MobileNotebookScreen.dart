@@ -38,6 +38,7 @@ class _MobileNotebookScreenState extends State<MobileNotebookScreen>
     fetchNotes();
     fetchLists();
     _tabController?.dispose();
+    //_refreshController.dispose();
     super.dispose();
   }
 
@@ -98,10 +99,12 @@ class _MobileNotebookScreenState extends State<MobileNotebookScreen>
         body: SmartRefresher(
           enablePullDown: true,
           enablePullUp: true,
-          header: MaterialClassicHeader(),
+          header: const ClassicHeader(), // Doğru header tipi
+          footer:
+              const ClassicFooter(), // Yükleme için bir footer eklenmesi önerilir
           controller: _refreshController,
-          onRefresh: () => {_onRefresh()},
-          onLoading: () => {_onLoading()},
+          onRefresh: _onRefresh,
+          onLoading: _onLoading,
           child: TabBarView(
             controller: _tabController,
             children: [
@@ -131,19 +134,18 @@ class _MobileNotebookScreenState extends State<MobileNotebookScreen>
                   final result = await Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) =>
-                          EditListScreen(list: list), //iyileştirilecek
+                      builder: (context) => EditListScreen(list: list),
                     ),
                   );
                   if (result == true) fetchLists();
                 },
-                crossCount: 1,
+                crossCount: cross,
                 onChanged: (String id, bool value) {
                   setState(() {
                     updateCheckbox(id, value);
                   });
                 },
-              )
+              ),
             ],
           ),
         ));
@@ -153,7 +155,8 @@ class _MobileNotebookScreenState extends State<MobileNotebookScreen>
     try {
       final notes = await _appService.fetchNotes();
       setState(() {
-        _notes = notes;
+        // Son güncelleme tarihine göre sıralama
+        _notes = notes..sort((a, b) => b['date'].compareTo(a['date']));
         isLoading = false;
       });
     } catch (e) {
@@ -165,7 +168,8 @@ class _MobileNotebookScreenState extends State<MobileNotebookScreen>
     try {
       final lists = await _appService.fetchLists();
       setState(() {
-        _lists = lists;
+        // Son güncelleme tarihine göre sıralama
+        _lists = lists..sort((a, b) => b['date'].compareTo(a['date']));
         isLoading = false;
       });
     } catch (e) {
@@ -222,18 +226,22 @@ class _MobileNotebookScreenState extends State<MobileNotebookScreen>
   }
 
   void _onRefresh() async {
-    // monitor network fetch
-    await Future.delayed(Duration(milliseconds: 1000));
-    // if failed,use refreshFailed()
-    _refreshController.refreshCompleted();
+    try {
+      await fetchNotes();
+      await fetchLists();
+      _refreshController.refreshCompleted();
+    } catch (e) {
+      _refreshController.refreshFailed();
+    }
   }
 
   void _onLoading() async {
-    // monitor network fetch
-    await Future.delayed(Duration(milliseconds: 1000));
-    // if failed,use loadFailed(),if no data return,use LoadNodata()
-    _lists.add((_lists.length + 1).toString());
-    if (mounted) setState(() {});
-    _refreshController.loadComplete();
+    try {
+      await fetchNotes();
+      await fetchLists();
+      _refreshController.loadComplete();
+    } catch (e) {
+      _refreshController.loadFailed();
+    }
   }
 }

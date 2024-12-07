@@ -47,7 +47,7 @@ class _AddListScreenState extends State<AddListScreen> {
         'uuid': uid,
         'list': _list,
         'color': "null",
-        'isChecked': "null",
+        'isChecked': "0",
         'type': type,
         'date': _formattedDate ??
             DateTime.now().toString(), // Formatlanmış tarihi gönderiyoruz
