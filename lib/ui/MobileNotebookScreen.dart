@@ -19,10 +19,11 @@ class _MobileNotebookScreenState extends State<MobileNotebookScreen>
   final AppService _appService = AppService();
   List<dynamic> _notes = [];
   List<dynamic> _lists = [];
-  TabController? _tabController;
+  List<dynamic> _colors = [];
+  late TabController _tabController;
   bool isLoading = true;
   bool isChecked = false;
-  RefreshController _refreshController =
+  final RefreshController _refreshController =
       RefreshController(initialRefresh: false);
 
   @override
@@ -35,127 +36,112 @@ class _MobileNotebookScreenState extends State<MobileNotebookScreen>
 
   @override
   void dispose() {
-    fetchNotes();
-    fetchLists();
-    _tabController?.dispose();
-    //_refreshController.dispose();
+    _tabController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
-    var cross = 1;
+    int crossCount = screenWidth < 600 ? 1 : 4;
 
-    if (screenWidth < 600) {
-      // Mobil ekran
-      cross = 1;
-    } else {
-      // Masaüstü ekran
-      cross = 4;
-    }
     return Scaffold(
-        appBar: AppBar(
-          title: null,
-          bottom: TabBar(
-            controller: _tabController,
-            tabs: const [
-              Tab(icon: Icon(Icons.note), text: "Notlar"),
-              Tab(icon: Icon(Icons.list), text: "Listeler"),
-            ],
-          ),
+      appBar: AppBar(
+        title: const Text('Notebook'),
+        bottom: TabBar(
+          controller: _tabController,
+          tabs: const [
+            Tab(icon: Icon(Icons.note), text: "Notlar"),
+            Tab(icon: Icon(Icons.list), text: "Listeler"),
+          ],
         ),
-        floatingActionButton: SpeedDial(
-          animatedIcon: AnimatedIcons.menu_close,
-          backgroundColor: Colors.cyan,
-          overlayOpacity: 0.1,
+      ),
+      floatingActionButton: SpeedDial(
+        animatedIcon: AnimatedIcons.menu_close,
+        backgroundColor: Colors.cyan,
+        overlayOpacity: 0.1,
+        children: [
+          SpeedDialChild(
+            child: const Icon(Icons.note_add, color: Colors.white),
+            backgroundColor: Colors.cyan,
+            label: 'Yeni Not Ekle',
+            onTap: () async {
+              final result = await Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => AddNoteScreen()),
+              );
+              if (result == true) fetchNotes();
+            },
+          ),
+          SpeedDialChild(
+            child: const Icon(Icons.list, color: Colors.white),
+            backgroundColor: Colors.cyan,
+            label: 'Yeni Liste Ekle',
+            onTap: () async {
+              final result = await Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => AddListScreen()),
+              );
+              if (result == true) fetchLists();
+            },
+          ),
+        ],
+      ),
+      body: SmartRefresher(
+        enablePullDown: true,
+        enablePullUp: false, // Yükleme devre dışı bırakıldı
+        header: const WaterDropHeader(), // Daha görsel bir header
+        controller: _refreshController,
+        onRefresh: _onRefresh,
+        child: TabBarView(
+          controller: _tabController,
           children: [
-            SpeedDialChild(
-              child: const Icon(Icons.note_add, color: Colors.white),
-              backgroundColor: Colors.cyan,
-              label: 'Yeni Not Ekle',
-              onTap: () async {
+            NotesTab(
+              crossCount: crossCount,
+              notes: _notes,
+              onDelete: deleteNote,
+              onEdit: (id) async {
+                final note = _notes.firstWhere((n) => n['id'].toString() == id);
                 final result = await Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => AddNoteScreen()),
+                  MaterialPageRoute(
+                    builder: (context) => EditNoteScreen(note: note),
+                  ),
                 );
                 if (result == true) fetchNotes();
               },
             ),
-            SpeedDialChild(
-              child: const Icon(Icons.list, color: Colors.white),
-              backgroundColor: Colors.cyan,
-              label: 'Yeni Liste Ekle',
-              onTap: () async {
+            ListsTab(
+              lists: _lists,
+              onDelete: deleteList,
+              isChecked: isChecked,
+              onEdit: (id) async {
+                final list = _lists.firstWhere((n) => n['id'].toString() == id);
                 final result = await Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => AddListScreen()),
+                  MaterialPageRoute(
+                    builder: (context) => EditListScreen(list: list),
+                  ),
                 );
                 if (result == true) fetchLists();
               },
-            )
+              crossCount: crossCount,
+              onChanged: (String id, bool value) {
+                setState(() {
+                  updateCheckbox(id, value);
+                });
+              },
+            ),
           ],
         ),
-        body: SmartRefresher(
-          enablePullDown: true,
-          enablePullUp: true,
-          header: const ClassicHeader(), // Doğru header tipi
-          footer:
-              const ClassicFooter(), // Yükleme için bir footer eklenmesi önerilir
-          controller: _refreshController,
-          onRefresh: _onRefresh,
-          onLoading: _onLoading,
-          child: TabBarView(
-            controller: _tabController,
-            children: [
-              NotesTab(
-                crossCount: cross,
-                notes: _notes,
-                onDelete: deleteNote,
-                onEdit: (id) async {
-                  final note =
-                      _notes.firstWhere((n) => n['id'].toString() == id);
-                  final result = await Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => EditNoteScreen(note: note),
-                    ),
-                  );
-                  if (result == true) fetchNotes();
-                },
-              ),
-              ListsTab(
-                lists: _lists,
-                onDelete: deleteList,
-                isChecked: isChecked,
-                onEdit: (id) async {
-                  final list =
-                      _lists.firstWhere((n) => n['id'].toString() == id);
-                  final result = await Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => EditListScreen(list: list),
-                    ),
-                  );
-                  if (result == true) fetchLists();
-                },
-                crossCount: cross,
-                onChanged: (String id, bool value) {
-                  setState(() {
-                    updateCheckbox(id, value);
-                  });
-                },
-              ),
-            ],
-          ),
-        ));
+      ),
+    );
   }
 
   Future<void> fetchNotes() async {
     try {
       final notes = await _appService.fetchNotes();
       setState(() {
-        // Son güncelleme tarihine göre sıralama
         _notes = notes..sort((a, b) => b['date'].compareTo(a['date']));
         isLoading = false;
       });
@@ -167,8 +153,26 @@ class _MobileNotebookScreenState extends State<MobileNotebookScreen>
   Future<void> fetchLists() async {
     try {
       final lists = await _appService.fetchLists();
+
+      Map<String, Color> colorNames = {
+        "red": Colors.red,
+        "blue": Colors.blue,
+        "green": Colors.green,
+        "yellow": Colors.yellow,
+        "black": Colors.black,
+        "white": Colors.white,
+        "orange": Colors.orange,
+        "grey": Colors.grey,
+        "purple": Colors.purple,
+        "cyan": Colors.cyan,
+      };
+
+      for (var _colors in lists) {
+        String colorName = _colors['color'] ?? 'white';
+        _colors['flutterColor'] = colorNames[colorName] ?? Colors.white;
+      }
+
       setState(() {
-        // Son güncelleme tarihine göre sıralama
         _lists = lists..sort((a, b) => b['date'].compareTo(a['date']));
         isLoading = false;
       });
@@ -232,16 +236,6 @@ class _MobileNotebookScreenState extends State<MobileNotebookScreen>
       _refreshController.refreshCompleted();
     } catch (e) {
       _refreshController.refreshFailed();
-    }
-  }
-
-  void _onLoading() async {
-    try {
-      await fetchNotes();
-      await fetchLists();
-      _refreshController.loadComplete();
-    } catch (e) {
-      _refreshController.loadFailed();
     }
   }
 }
