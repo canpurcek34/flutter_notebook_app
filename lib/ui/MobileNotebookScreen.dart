@@ -19,7 +19,6 @@ class _MobileNotebookScreenState extends State<MobileNotebookScreen>
   final AppService _appService = AppService();
   List<dynamic> _notes = [];
   List<dynamic> _lists = [];
-  List<dynamic> _colors = [];
   late TabController _tabController;
   bool isLoading = true;
   bool isChecked = false;
